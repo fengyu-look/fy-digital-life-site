@@ -1,0 +1,291 @@
+.orbit-recommendations-page [data-framer-name="Type-tester"] {
+  display: none !important;
+}
+
+.orbit-recommendations-page [data-framer-name="case-header"] {
+  gap: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.orbit-recommendations-page [data-framer-name="case-header"] > *:not([data-framer-name="case-nav-title"]) {
+  display: none !important;
+}
+
+.orbit-recommendations-page [data-framer-name="case-nav-title"] {
+  gap: 0 !important;
+}
+
+.orbit-recommendations-page [data-framer-name="case-nav-title"] > *:not([data-framer-name="breadcrumb"]) {
+  display: none !important;
+}
+
+.orbit-recommendations-page [data-framer-name="Video Case Section"] {
+  height: clamp(320px, 48vw, 640px) !important;
+  padding-bottom: 48px !important;
+}
+
+.orbit-recommendations-page [data-framer-name="Video Case Section"] img,
+.orbit-recommendations-page [data-framer-name="Video Case Section"] video {
+  object-fit: cover !important;
+  object-position: center center !important;
+}
+
+.orbit-recommendations-page a[data-orbit-footer-plain="true"] {
+  cursor: default !important;
+  pointer-events: none !important;
+  text-decoration: none !important;
+}
+
+.orbit-recommendations-page a[data-orbit-footer-plain="true"] [data-framer-name="arrow"],
+.orbit-recommendations-page a[data-orbit-footer-plain="true"] [data-framer-name="btn_socials"] > [data-framer-name="arrow"] {
+  display: none !important;
+}
+
+.orbit-recommendations {
+  background: var(--token-26053b4a-f306-4fd1-996f-6d79fd5f13e3, #f4f4f4);
+  color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
+  width: 100%;
+  padding: 8px 20px 96px;
+}
+
+.orbit-recommendations__inner {
+  margin: 0 auto;
+  max-width: 1400px;
+}
+
+.orbit-recommendations__label,
+.orbit-card__meta,
+.orbit-card__link {
+  color: var(--token-648d07ba-0cee-4673-90d9-650fc59b1a1f, #055dff);
+  font-family: "Orbit Mono Regular", "Orbit Mono Regular Placeholder", monospace;
+  font-size: 10px;
+  letter-spacing: 0;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.orbit-recommendations__intro {
+  display: grid;
+  align-items: center;
+  gap: clamp(28px, 4vw, 52px);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 420px);
+  padding: 36px 0 42px;
+}
+
+.orbit-recommendations__title {
+  color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
+  font-family: "Doto Rounded Black", "Doto Rounded ExtraBold", "Switzer", sans-serif;
+  font-size: clamp(60px, 7vw, 104px);
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.9;
+  max-width: 660px;
+  text-wrap: balance;
+  text-transform: none;
+  transform: translateY(22px);
+  opacity: 0;
+  animation: orbit-title-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) 180ms forwards;
+}
+
+.orbit-recommendations__copy {
+  align-self: end;
+  color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
+  font-family: "Space Grotesk", "Switzer", "Inter Display", sans-serif;
+  font-size: 20px;
+  letter-spacing: 0;
+  line-height: 1.5;
+  max-width: 460px;
+  text-transform: none;
+  transform: translateY(18px);
+  opacity: 0;
+  animation: orbit-copy-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) 340ms forwards;
+}
+
+.orbit-recommendations__copy::before {
+  background: var(--token-648d07ba-0cee-4673-90d9-650fc59b1a1f, #055dff);
+  border-radius: 999px;
+  content: "";
+  display: block;
+  height: 9px;
+  margin-bottom: 20px;
+  width: 9px;
+}
+
+.orbit-recommendations__grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.orbit-card {
+  background: #ffffff;
+  border: 1px solid rgba(64, 64, 64, 0.12);
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  min-height: 430px;
+  overflow: hidden;
+  text-decoration: none;
+  transform: translateY(28px);
+  opacity: 0;
+  transition:
+    border-color 260ms ease,
+    box-shadow 260ms ease,
+    opacity 520ms ease,
+    transform 520ms ease;
+}
+
+.orbit-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.orbit-card:hover {
+  border-color: rgba(5, 93, 255, 0.55);
+  box-shadow: 0 24px 70px rgba(22, 24, 25, 0.12);
+  transform: translateY(-6px);
+}
+
+.orbit-card__media {
+  aspect-ratio: 1.35;
+  background: #161819;
+  overflow: hidden;
+}
+
+.orbit-card__media img,
+.orbit-card__media video {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.01);
+  transition: transform 520ms ease, filter 520ms ease;
+  width: 100%;
+}
+
+.orbit-card:hover .orbit-card__media img,
+.orbit-card:hover .orbit-card__media video {
+  filter: saturate(1.08) contrast(1.03);
+  transform: scale(1.06);
+}
+
+.orbit-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+}
+
+.orbit-card__title {
+  color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
+  font-family: "Switzer", "Switzer Placeholder", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.orbit-card__description {
+  color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
+  font-family: "Switzer", "Switzer Placeholder", sans-serif;
+  font-size: 15px;
+  letter-spacing: 0;
+  line-height: 1.35;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.orbit-card__link {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.orbit-card__link::before {
+  background: currentColor;
+  border-radius: 999px;
+  content: "";
+  height: 9px;
+  width: 9px;
+}
+
+.orbit-card__link::after {
+  content: ">";
+  transform: translateX(0);
+  transition: transform 220ms ease;
+}
+
+.orbit-card:hover .orbit-card__link::after {
+  transform: translateX(5px);
+}
+
+@media (max-width: 1024px) {
+  .orbit-recommendations__intro {
+    gap: 28px;
+    grid-template-columns: 1fr;
+  }
+
+  .orbit-recommendations__copy {
+    align-self: start;
+  }
+
+  .orbit-recommendations__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .orbit-recommendations {
+    padding: 8px 12px 72px;
+  }
+
+  .orbit-recommendations__intro {
+    padding: 48px 0 40px;
+  }
+
+  .orbit-recommendations__title {
+    font-size: 56px;
+    max-width: 100%;
+  }
+
+  .orbit-recommendations__copy {
+    font-size: 16px;
+  }
+
+  .orbit-recommendations__grid {
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+
+  .orbit-card {
+    min-height: 380px;
+  }
+}
+
+@keyframes orbit-title-rise {
+  0% {
+    filter: blur(8px);
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes orbit-copy-rise {
+  0% {
+    filter: blur(6px);
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,336 @@
+.framer-Srm7S .framer-1httujo,
+.framer-Srm7S .framer-1m7rddq {
+  display: none !important;
+}
+
+.framer-Srm7S .framer-3384ic {
+  min-height: 100vh !important;
+  padding-top: clamp(96px, 15vh, 180px) !important;
+  padding-bottom: clamp(72px, 12vh, 120px) !important;
+}
+
+.framer-Srm7S .framer-1au3csl {
+  top: -34px !important;
+}
+
+.framer-Srm7S .framer-elw45w {
+  top: 28px !important;
+  overflow: visible !important;
+}
+
+.framer-Srm7S .framer-evaq9l {
+  height: 230px !important;
+  overflow: visible !important;
+}
+
+.framer-Srm7S .framer-kb7hfg {
+  top: 42px !important;
+}
+
+.framer-Srm7S .custom-glow-feature-section {
+  order: 1;
+  display: block;
+  flex: none;
+  width: calc(100% - 42px);
+  margin: 10px 42px 18px 0;
+  perspective: 1200px;
+}
+
+.framer-Srm7S .custom-ai-image-card {
+  position: relative;
+  height: 190px;
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(26px) scale(0.985);
+  animation: customAiCardReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+  background: #0a0a0b;
+  box-shadow:
+    0 18px 60px rgba(7, 12, 18, 0.26),
+    0 0 0 1px rgba(255, 255, 255, 0.14) inset;
+}
+
+.framer-Srm7S .custom-ai-image-card::before {
+  content: "";
+  position: absolute;
+  inset: -28%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 22% 46%, rgba(110, 190, 255, 0.45), transparent 30%),
+    radial-gradient(circle at 74% 50%, rgba(255, 255, 255, 0.28), transparent 42%),
+    linear-gradient(110deg, rgba(49, 106, 150, 0.25), rgba(210, 231, 241, 0.2));
+  filter: blur(38px);
+  opacity: 0.75;
+  animation: customAiAura 6s ease-in-out infinite alternate;
+}
+
+.framer-Srm7S .custom-ai-image-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 45%, transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 32%, rgba(10, 10, 11, 0.18));
+  mix-blend-mode: screen;
+  opacity: 0.55;
+  transform: translateX(-115%);
+  animation: customAiScan 4.8s cubic-bezier(0.45, 0, 0.2, 1) 0.8s infinite;
+}
+
+.framer-Srm7S .custom-ai-image-card img {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  filter: grayscale(0.18) saturate(0.82) contrast(0.98) brightness(1.03);
+  transform: scale(1.04);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: customAiDrift 9s ease-in-out infinite alternate;
+}
+
+.framer-Srm7S .custom-ai-image-card:hover img {
+  filter: grayscale(0.08) saturate(0.96) contrast(1.02) brightness(1.06);
+  transform: scale(1.075);
+}
+
+.framer-Srm7S .custom-ai-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.16;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.13) 0 1px, transparent 1px 4px),
+    linear-gradient(90deg, rgba(8, 16, 24, 0.34), transparent 42%, rgba(236, 246, 255, 0.22));
+  mix-blend-mode: overlay;
+}
+
+.framer-Srm7S .custom-ai-border {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 1px rgba(221, 237, 248, 0.46) inset,
+    0 0 32px rgba(145, 206, 255, 0.18) inset;
+}
+
+.framer-Srm7S .framer-1i9ktln {
+  order: 2;
+}
+
+.framer-Srm7S .framer-cd8q7v,
+.framer-Srm7S .framer-1np08pl,
+.framer-Srm7S .framer-m1ai17,
+.framer-Srm7S .framer-ds1yuo,
+.framer-Srm7S a[href="./work"],
+.framer-Srm7S a[href="/work"],
+.framer-WpkEI .framer-g84q8p,
+.framer-ZpACs .framer-g84q8p {
+  display: none !important;
+}
+
+.framer-Srm7S .framer-10sgd9i-container p,
+.framer-Srm7S .framer-14xlhbk-container p {
+  font-size: 13px !important;
+  line-height: 1.35em !important;
+}
+
+.framer-Srm7S .framer-12yl16e > p,
+.framer-Srm7S .framer-1869o6n > p {
+  display: none !important;
+}
+
+.framer-Srm7S .framer-12yl16e::after,
+.framer-Srm7S .framer-1869o6n::after {
+  display: block;
+  color: var(--token-26053b4a-f306-4fd1-996f-6d79fd5f13e3, rgb(244, 244, 244));
+  font-family: "Switzer", "Switzer Placeholder", sans-serif;
+  font-size: 14px;
+  line-height: 120%;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.framer-Srm7S .framer-12yl16e::after {
+  content: "个人的作品摄影创作";
+}
+
+.framer-Srm7S .framer-1869o6n::after {
+  content: "Agent工具安装教程";
+}
+
+.framer-Srm7S a[href*="/studio/useful-websites"] .framer-1869o6n::after {
+  content: "链接宇宙";
+}
+
+.framer-Srm7S a[href*="/studio/prompt-collection"] [data-framer-name="title"],
+.framer-Srm7S a[href*="/studio/skill-workflow"] [data-framer-name="title"] {
+  position: relative !important;
+}
+
+.framer-Srm7S a[href*="/studio/prompt-collection"] [data-framer-name="title"] p,
+.framer-Srm7S a[href*="/studio/skill-workflow"] [data-framer-name="title"] p {
+  opacity: 0 !important;
+}
+
+.framer-Srm7S a[href*="/studio/prompt-collection"] [data-framer-name="title"]::after,
+.framer-Srm7S a[href*="/studio/skill-workflow"] [data-framer-name="title"]::after {
+  color: var(--token-26053b4a-f306-4fd1-996f-6d79fd5f13e3, rgb(244, 244, 244));
+  content: "";
+  font-family: "Orbit Mono Regular", "Orbit Mono Regular Placeholder", monospace;
+  font-size: clamp(30px, 4.2vw, 61px);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.05;
+  position: absolute;
+  inset: 0 auto auto 0;
+  text-transform: uppercase;
+  white-space: pre-line;
+}
+
+.framer-Srm7S a[href*="/studio/prompt-collection"] [data-framer-name="title"]::after {
+  content: "PROMPT\\A COLLECTION";
+}
+
+.framer-Srm7S a[href*="/studio/skill-workflow"] [data-framer-name="title"]::after {
+  content: "SKILL\\A WORKFLOW";
+}
+
+.framer-Srm7S [data-framer-name="btn"],
+.framer-Srm7S [data-framer-name="btn"] *,
+.framer-Srm7S .framer-18o83wi-container,
+.framer-Srm7S .framer-18o83wi-container *,
+.framer-Srm7S .framer-f2qnt8-container,
+.framer-Srm7S .framer-f2qnt8-container *,
+.framer-Srm7S .framer-bgiz5d-container,
+.framer-Srm7S .framer-bgiz5d-container * {
+  color: var(--token-b4bbd11d-1da9-4c45-a8d9-f643dc3ab4c2, rgb(179, 179, 179)) !important;
+  -webkit-text-fill-color: var(--token-b4bbd11d-1da9-4c45-a8d9-f643dc3ab4c2, rgb(179, 179, 179)) !important;
+}
+
+.framer-WpkEI .framer-8a4i6,
+.framer-WpkEI .framer-1obgwak,
+.framer-ZpACs .framer-8a4i6,
+.framer-ZpACs .framer-1obgwak {
+  align-items: flex-start !important;
+}
+
+.framer-WpkEI .framer-6uux5y,
+.framer-WpkEI .framer-18dedow,
+.framer-ZpACs .framer-6uux5y,
+.framer-ZpACs .framer-18dedow {
+  align-self: flex-start !important;
+  justify-content: flex-start !important;
+  margin-left: 0 !important;
+  text-align: left !important;
+}
+
+.framer-WpkEI .framer-1obgwak,
+.framer-ZpACs .framer-1obgwak {
+  cursor: default !important;
+  pointer-events: none !important;
+  text-decoration: none !important;
+}
+
+.framer-WpkEI .framer-17dkr2f,
+.framer-ZpACs .framer-17dkr2f {
+  display: none !important;
+}
+
+@media (min-width: 810px) {
+  .framer-WpkEI .framer-8a4i6,
+  .framer-WpkEI .framer-1obgwak,
+  .framer-ZpACs .framer-8a4i6,
+  .framer-ZpACs .framer-1obgwak {
+    display: grid !important;
+    gap: 0 !important;
+    grid-template-columns: 143px auto !important;
+  }
+}
+
+@keyframes customAiCardReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes customAiAura {
+  from {
+    opacity: 0.48;
+    transform: translate3d(-2%, -1%, 0) scale(1);
+  }
+  to {
+    opacity: 0.86;
+    transform: translate3d(2%, 1%, 0) scale(1.05);
+  }
+}
+
+@keyframes customAiScan {
+  0%,
+  42% {
+    transform: translateX(-115%);
+  }
+  68%,
+  100% {
+    transform: translateX(115%);
+  }
+}
+
+@keyframes customAiDrift {
+  from {
+    transform: scale(1.04) translateX(-0.7%);
+  }
+  to {
+    transform: scale(1.07) translateX(0.7%);
+  }
+}
+
+@media (max-width: 809.98px) {
+  .framer-Srm7S .framer-3384ic {
+    min-height: 100svh !important;
+    padding-top: 88px !important;
+    padding-bottom: 64px !important;
+  }
+
+  .framer-Srm7S .framer-1au3csl {
+    top: -22px !important;
+  }
+
+  .framer-Srm7S .framer-elw45w {
+    top: 16px !important;
+    overflow: visible !important;
+  }
+
+  .framer-Srm7S .framer-evaq9l {
+    height: 150px !important;
+    overflow: visible !important;
+  }
+
+  .framer-Srm7S .framer-kb7hfg {
+    top: 24px !important;
+  }
+
+  .framer-Srm7S .custom-glow-feature-section {
+    width: 100%;
+    margin: 4px 0 16px 0;
+  }
+
+  .framer-Srm7S .custom-ai-image-card {
+    height: 132px;
+    border-radius: 8px;
+  }
+
+  .framer-Srm7S .custom-ai-image-card img {
+    object-position: 37% 50%;
+  }
+}

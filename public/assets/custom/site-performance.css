@@ -1,0 +1,57 @@
+.framer-PjP0r,
+.framer-PjP0r .framer-muvbtt-container {
+  pointer-events: none !important;
+}
+
+.framer-PjP0r {
+  contain: layout paint;
+}
+
+/* 全站导航栏"关于"悬浮卡片：5:3 比例，内部空间舒展 */
+.framer-tNxbE .framer-1h33cps {
+  width: 230px !important;
+}
+.framer-tNxbE .framer-1h33cps .framer-1l476tx {
+  width: 30px !important;
+}
+
+.photography-showcase-page .framer-1fs3yze,
+.prompt-recommendations-page .framer-xt7mg9,
+.skill-recommendations-page .framer-4d7el7,
+.agent-guide-page .framer-im8hx9 {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+@media (min-width: 1600px) {
+  .orbit-recommendations,
+  .prompt-recommendations,
+  .skill-recommendations,
+  .agent-guide {
+    padding-left: clamp(20px, 2.4vw, 48px);
+    padding-right: clamp(20px, 2.4vw, 48px);
+  }
+
+  .orbit-recommendations__inner,
+  .prompt-recommendations__inner,
+  .skill-recommendations__inner,
+  .agent-guide__inner,
+  .photo-shell {
+    max-width: min(1500px, calc(100vw - 96px));
+  }
+
+  .photo-hero,
+  .photo-sequence,
+  .photo-outro {
+    padding-left: clamp(20px, 2.4vw, 48px);
+    padding-right: clamp(20px, 2.4vw, 48px);
+  }
+
+  .lab-hero__graphics,
+  .lab-hero__meta,
+  .lab-hero__content,
+  .lab-visual {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}

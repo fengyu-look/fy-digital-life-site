@@ -1,0 +1,15 @@
+node_modules/
+.DS_Store
+.mirror-cache/
+npm-debug.log*
+dist/
+annotations/
+.env.local
+public/assets/custom/photo-hero-234.mp4
+public/assets/custom/work-card-prompt-web.mp4
+public/assets/custom/work-card-skill-web.mp4
+public/assets/custom/work-card-agent-small-web.mp4
+public/assets/custom/home-hero-user-video.mp4
+public/assets/custom/work-card-photo-web.mp4
+public/assets/framerusercontent.com/assets/raU02RTJ8fj9IFxmN9SKwzHCGo.mp4
+public/assets/framerusercontent.com/assets/8A1rHrUjomCRzLZTKOfW0iXe0E0.mp4

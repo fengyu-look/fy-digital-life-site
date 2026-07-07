@@ -1,0 +1,14 @@
+{
+  "name": "fy-digital-life-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "import:legacy": "node scripts/mirror-site.mjs",
+    "build": "node scripts/build-site.mjs",
+    "deploy:check": "node scripts/check-cloudflare-pages.mjs",
+    "validate:routes": "node scripts/validate-routes.mjs",
+    "dev": "node scripts/server.mjs public 5173",
+    "preview": "node scripts/server.mjs dist 4173"
+  }
+}
