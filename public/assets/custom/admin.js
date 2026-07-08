@@ -159,28 +159,38 @@ async function loadProfile() {
   form.elements.social_links.value = JSON.stringify(data.social_links ?? [], null, 2);
 }
 
-async function verifyAdmin() {
-  const { data, error } = await supabase.from("admin_users").select("user_id").limit(1);
+async function verifyAdmin(session) {
+  const userId = session?.user?.id;
+  if (!userId) return false;
+
+  const { data, error } = await supabase
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", userId)
+    .limit(1);
   if (error) throw error;
   return Boolean(data?.length);
 }
 
 async function showAdmin(session) {
+  const isAdmin = await verifyAdmin(session);
+  if (!isAdmin) {
+    throw new Error("这个账号还不是管理员。");
+  }
+
   currentSession = session;
   els.loginPanel.hidden = true;
   els.adminPanel.hidden = false;
   els.logoutButton.hidden = false;
   els.sessionEmail.textContent = session.user.email;
 
-  const isAdmin = await verifyAdmin();
-  if (!isAdmin) {
-    await supabase.auth.signOut();
-    throw new Error("这个账号还不是管理员。");
+  try {
+    await Promise.all([loadRecommendations(), loadProfile()]);
+    resetRecommendationForm();
+    setStatus("后台已连接。");
+  } catch (error) {
+    setStatus(`已登录，但内容读取失败：${error.message}`, true);
   }
-
-  await Promise.all([loadRecommendations(), loadProfile()]);
-  resetRecommendationForm();
-  setStatus("后台已连接。");
 }
 
 function showLogin() {
