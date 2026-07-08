@@ -78,6 +78,30 @@
     return wrap;
   }
 
+  function listFrom(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).map(String);
+    if (typeof value !== "string") return [];
+    return value
+      .split(/[,，\n]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function mapContentItem(item) {
+    const data = item.data || {};
+    const type = data.skill_type || item.item_type || "SKILL";
+    return {
+      type: String(type).toUpperCase(),
+      title: item.title,
+      description: data.use_cases || item.summary || "",
+      meta: item.category || data.applicable_scene || "SKILL / WORKFLOW",
+      image: item.cover_url || "/assets/custom/work-card-skill-web.mp4",
+      includes: listFrom(data.includes).length ? listFrom(data.includes) : listFrom(item.tags),
+      url: item.link_url || "#",
+      linkLabel: data.button_label || (String(type).toUpperCase() === "WORKFLOW" ? "VIEW WORKFLOW" : "VIEW ON GITHUB"),
+    };
+  }
+
   function buildCard(card) {
     const article = document.createElement("article");
     article.className = "skill-card";
@@ -113,11 +137,31 @@
 
     const link = body.querySelector(".skill-card__link");
     link.href = card.url;
-    link.textContent = card.type === "WORKFLOW" ? "VIEW WORKFLOW" : "VIEW ON GITHUB";
+    link.textContent = card.linkLabel || (card.type === "WORKFLOW" ? "VIEW WORKFLOW" : "VIEW ON GITHUB");
 
     article.appendChild(mediaFor(card));
     article.appendChild(body);
     return article;
+  }
+
+  function renderCards(grid, items) {
+    grid.innerHTML = "";
+    items.forEach((card) => grid.appendChild(buildCard(card)));
+  }
+
+  async function hydrateContent(section) {
+    try {
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const items = await fetchPublishedContentItems("skill-workflow");
+      if (!items.length) return;
+
+      const grid = section.querySelector(".skill-recommendations__grid");
+      if (!grid) return;
+      renderCards(grid, items.map(mapContentItem));
+      revealCards(section);
+    } catch (error) {
+      console.warn("[FY Content] skill-workflow fallback content used:", error);
+    }
   }
 
   function buildSection() {
@@ -226,6 +270,7 @@
     const section = buildSection();
     anchor.parentNode.insertBefore(section, anchor.nextSibling);
     revealCards(section);
+    hydrateContent(section);
     return true;
   }
 

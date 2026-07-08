@@ -99,6 +99,18 @@
     return ok ? Promise.resolve() : Promise.reject(new Error("copy failed"));
   }
 
+  function mapContentItem(item) {
+    const data = item.data || {};
+    return {
+      title: item.title,
+      description: item.summary || "",
+      meta: item.category || data.prompt_type || "PROMPT",
+      image: item.cover_url || "/assets/custom/latest-work-card.png",
+      prompt: data.prompt || "",
+      copyLabel: data.copy_button_label || "点击复制",
+    };
+  }
+
   function buildCard(card) {
     const article = document.createElement("article");
     article.className = "prompt-card";
@@ -115,6 +127,7 @@
     setText(body, ".prompt-card__meta", card.meta);
     setText(body, ".prompt-card__title", card.title);
     setText(body, ".prompt-card__description", card.description);
+    setText(body, ".prompt-card__copy", card.copyLabel || "点击复制");
 
     const button = body.querySelector(".prompt-card__copy");
     button.addEventListener("click", async () => {
@@ -133,6 +146,26 @@
     article.appendChild(mediaFor(card));
     article.appendChild(body);
     return article;
+  }
+
+  function renderCards(grid, items) {
+    grid.innerHTML = "";
+    items.forEach((card) => grid.appendChild(buildCard(card)));
+  }
+
+  async function hydrateContent(section) {
+    try {
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const items = await fetchPublishedContentItems("prompt-collection");
+      if (!items.length) return;
+
+      const grid = section.querySelector(".prompt-recommendations__grid");
+      if (!grid) return;
+      renderCards(grid, items.map(mapContentItem));
+      revealCards(section);
+    } catch (error) {
+      console.warn("[FY Content] prompt-collection fallback content used:", error);
+    }
   }
 
   function buildSection() {
@@ -241,6 +274,7 @@
     const section = buildSection();
     anchor.parentNode.insertBefore(section, anchor.nextSibling);
     revealCards(section);
+    hydrateContent(section);
     return true;
   }
 

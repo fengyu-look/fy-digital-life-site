@@ -62,6 +62,51 @@
     return `<img src="${card.image}" alt="" loading="lazy" decoding="async">`;
   }
 
+  function mapContentItem(item) {
+    const data = item.data || {};
+    return {
+      title: data.site_name || item.title,
+      description: data.recommend_reason || item.summary || "",
+      href: item.link_url || "#",
+      image: item.cover_url || "/assets/custom/latest-work-card.png",
+      meta: item.category || data.pricing || "WEB / RESOURCE",
+      linkLabel: data.button_label || "VISIT SITE",
+    };
+  }
+
+  function cardMarkup(card) {
+    return `
+      <a class="orbit-card" href="${card.href}" target="_blank" rel="noopener noreferrer">
+        <div class="orbit-card__media">${mediaFor(card)}</div>
+        <div class="orbit-card__body">
+          <div class="orbit-card__meta">${card.meta}</div>
+          <div class="orbit-card__title">${card.title}</div>
+          <p class="orbit-card__description">${card.description}</p>
+          <span class="orbit-card__link">${card.linkLabel || "VISIT SITE"}</span>
+        </div>
+      </a>
+    `;
+  }
+
+  function renderCards(grid, items) {
+    grid.innerHTML = items.map(cardMarkup).join("");
+  }
+
+  async function hydrateContent(section) {
+    try {
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const items = await fetchPublishedContentItems("useful-websites");
+      if (!items.length) return;
+
+      const grid = section.querySelector(".orbit-recommendations__grid");
+      if (!grid) return;
+      renderCards(grid, items.map(mapContentItem));
+      revealCards(section);
+    } catch (error) {
+      console.warn("[FY Content] useful-websites fallback content used:", error);
+    }
+  }
+
   function buildSection() {
     const section = document.createElement("section");
     section.className = "orbit-recommendations";
@@ -74,17 +119,7 @@
           <p class="orbit-recommendations__copy">数字世界的浩瀚星河里，我们为你打捞那些真正闪光的岛屿。这里不只是链接的汇聚，更是高效、灵感与审美的共鸣地。打破信息的冗余，每一次点击，都是一场关于卓越的探索。</p>
         </div>
         <div class="orbit-recommendations__grid">
-          ${cards.map((card) => `
-            <a class="orbit-card" href="${card.href}" target="_blank" rel="noopener noreferrer">
-              <div class="orbit-card__media">${mediaFor(card)}</div>
-              <div class="orbit-card__body">
-                <div class="orbit-card__meta">${card.meta}</div>
-                <div class="orbit-card__title">${card.title}</div>
-                <p class="orbit-card__description">${card.description}</p>
-                <span class="orbit-card__link">VISIT SITE</span>
-              </div>
-            </a>
-          `).join("")}
+          ${cards.map(cardMarkup).join("")}
         </div>
       </div>
     `;
@@ -221,6 +256,7 @@
     const section = buildSection();
     anchor.parentNode.insertBefore(section, anchor);
     revealCards(section);
+    hydrateContent(section);
     return true;
   }
 

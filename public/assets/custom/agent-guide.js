@@ -4,7 +4,7 @@
   let lastFocus = null;
   let lockedScrollY = 0;
 
-  const tools = [
+  let tools = [
     {
       title: "Hermes Agent",
       group: "HOT / OVERSEAS",
@@ -734,7 +734,7 @@
     }
   ];
 
-  const pages = [
+  let pages = [
     "热门国外 Agent",
     "国内智能体平台",
     "代码与开发 Agent",
@@ -804,6 +804,71 @@
     else section.appendChild(el("p", "agent-modal__text", content));
 
     parent.appendChild(section);
+  }
+
+  function listFrom(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).map(String);
+    if (typeof value !== "string") return [];
+    return value
+      .split(/\n|[,，]/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  function stepsFrom(value) {
+    if (Array.isArray(value)) {
+      return value.map((item) => {
+        if (typeof item === "string") return { text: item, code: "" };
+        return { text: item.text || "", code: item.code || "" };
+      }).filter((item) => item.text || item.code);
+    }
+
+    return listFrom(value).map((text) => ({ text, code: "" }));
+  }
+
+  function sourcesFrom(value, fallbackUrl) {
+    if (Array.isArray(value)) {
+      return value.map((item, index) => {
+        if (Array.isArray(item)) return [item[0] || `资料 ${index + 1}`, item[1] || fallbackUrl || "#"];
+        if (typeof item === "object" && item) return [item.label || item.title || `资料 ${index + 1}`, item.url || item.href || fallbackUrl || "#"];
+        return [`资料 ${index + 1}`, String(item)];
+      });
+    }
+
+    const links = listFrom(value);
+    if (links.length) return links.map((href, index) => [`资料 ${index + 1}`, href]);
+    return [[fallbackUrl ? "官网 / 文档" : "资料入口", fallbackUrl || "#"]];
+  }
+
+  function mapContentItem(item) {
+    const data = item.data || {};
+    const tags = listFrom(item.tags);
+    const requirements = listFrom(data.requirements);
+    const steps = stepsFrom(data.steps);
+    const link = item.link_url || data.tool_url || "#";
+
+    return {
+      title: item.title,
+      group: item.category || "AGENT / GUIDE",
+      description: item.summary || "",
+      tags: tags.length ? tags : ["Agent", "Guide"],
+      difficulty: data.difficulty || "入门友好",
+      model: data.model || data.tool_type || "按教程配置",
+      success: data.success || "能按步骤完成一次验证。",
+      source: link,
+      guide: {
+        quick: steps.length ? steps.map((step) => step.text || step.code) : ["打开教程入口。", "按步骤完成配置。", "做一次最小验证。"],
+        what: data.what || item.summary || "这是一个可以通过后台维护的 Agent 教程卡片。",
+        fit: data.use_cases || "适合需要按步骤安装、配置或理解这个工具的人。",
+        prepare: requirements.length ? requirements : ["准备账号、网络环境和需要的 API Key。"],
+        mac: steps,
+        windows: steps,
+        verify: listFrom(data.verify).length ? listFrom(data.verify) : ["完成一次打开、登录或调用测试。"],
+        deepseek: listFrom(data.call_instruction).length ? listFrom(data.call_instruction) : ["按工具文档填写模型、API Key 和 Base URL。"],
+        errors: listFrom(data.errors).length ? listFrom(data.errors) : ["如果失败，先检查账号、权限、网络和填写内容。"],
+        sources: sourcesFrom(data.tool_links, link),
+      },
+    };
   }
 
   function buildCard(card, index) {
@@ -1025,6 +1090,21 @@
     return section;
   }
 
+  async function hydrateContent(section) {
+    try {
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const items = await fetchPublishedContentItems("agent-guide");
+      if (!items.length) return;
+
+      tools = items.map(mapContentItem);
+      pages = Array.from({ length: Math.ceil(tools.length / pageSize) }, (_, index) => `Agent 教程 ${index + 1}`);
+      currentPage = 0;
+      renderPage(section);
+    } catch (error) {
+      console.warn("[FY Content] agent-guide fallback content used:", error);
+    }
+  }
+
   function normalizeBreadcrumb() {
     const breadcrumb = document.querySelector('[data-framer-name="breadcrumb"]');
     if (!breadcrumb) return;
@@ -1141,6 +1221,7 @@
 
     const section = buildSection();
     anchor.parentNode.insertBefore(section, anchor.nextSibling);
+    hydrateContent(section);
     return true;
   }
 

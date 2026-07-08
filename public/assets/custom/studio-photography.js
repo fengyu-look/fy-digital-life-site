@@ -43,6 +43,26 @@
     return `<img src="${photo.src}" alt="" loading="${eager ? "eager" : "lazy"}" decoding="async"${position}>`;
   }
 
+  function mapContentItem(item) {
+    const data = item.data || {};
+    return {
+      src: item.cover_url || data.image_url || "/assets/custom/latest-work-card.png",
+      ratio: data.ratio || item.layout_variant || "wide",
+      focus: data.focus || "center center",
+      title: item.title,
+      caption: data.caption || item.summary || "",
+    };
+  }
+
+  function fillPhotoSet(items, minimum = 20) {
+    const source = items.length ? items : photos;
+    const result = [];
+    for (let index = 0; index < minimum; index += 1) {
+      result.push(source[index % source.length]);
+    }
+    return result;
+  }
+
   function buildFilmStrip(items, reverse = false) {
     const strip = document.createElement("section");
     strip.className = `photo-strip${reverse ? " photo-strip--reverse" : ""}`;
@@ -95,7 +115,9 @@
     return sequence;
   }
 
-  function buildSection() {
+  function buildSection(photoItems = photos) {
+    const displayPhotos = fillPhotoSet(photoItems, 20);
+    const displayFeature = displayPhotos[0] || featurePhoto;
     const section = document.createElement("section");
     section.className = "photography-showcase";
     section.setAttribute("aria-label", "Personal photography works");
@@ -120,12 +142,12 @@
       </section>
     `;
 
-    section.appendChild(buildFilmStrip(photos.slice(0, 8)));
+    section.appendChild(buildFilmStrip(displayPhotos.slice(0, 8)));
     section.appendChild(buildMarquee());
 
     const full = document.createElement("figure");
     full.className = "photo-fullbleed photo-reveal";
-    full.innerHTML = imgMarkup(featurePhoto);
+    full.innerHTML = imgMarkup(displayFeature);
     section.appendChild(full);
 
     const text = document.createElement("section");
@@ -133,8 +155,8 @@
     text.innerHTML = `<p class="photo-text__body photo-text__body--animated">留在照片里的，不只是被看见的瞬间，而是注意力经过时留下的压力。光把证据，慢慢变成氛围。</p>`;
     section.appendChild(text);
 
-    section.appendChild(buildFilmStrip(photos.slice(8, 16), true));
-    section.appendChild(buildSequence(photos.slice(16, 20)));
+    section.appendChild(buildFilmStrip(displayPhotos.slice(8, 16), true));
+    section.appendChild(buildSequence(displayPhotos.slice(16, 20)));
 
     const outro = document.createElement("section");
     outro.className = "photo-shell photo-outro photo-reveal";
@@ -144,6 +166,21 @@
     section.appendChild(outro);
 
     return section;
+  }
+
+  async function hydrateContent(section) {
+    try {
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const items = await fetchPublishedContentItems("photography");
+      if (!items.length) return;
+
+      const dynamicSection = buildSection(items.map(mapContentItem));
+      section.replaceWith(dynamicSection);
+      dynamicSection.querySelectorAll("video").forEach((video) => window.customVideoController?.observe?.(video));
+      revealElements(dynamicSection);
+    } catch (error) {
+      console.warn("[FY Content] photography fallback content used:", error);
+    }
   }
 
   function normalizeBreadcrumb() {
@@ -233,6 +270,7 @@
     anchor.parentNode.insertBefore(section, anchor.nextSibling);
     section.querySelectorAll("video").forEach((video) => window.customVideoController?.observe?.(video));
     revealElements(section);
+    hydrateContent(section);
     return true;
   }
 
