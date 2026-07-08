@@ -21,6 +21,7 @@ const els = {
 
 let currentSession = null;
 let recommendations = [];
+const fallbackAdminEmails = new Set(["fengyuaimengyu@outlook.com"]);
 
 function setStatus(message, isError = false) {
   els.statusLine.textContent = message;
@@ -161,21 +162,42 @@ async function loadProfile() {
 
 async function verifyAdmin(session) {
   const userId = session?.user?.id;
-  if (!userId) return false;
+  const email = session?.user?.email?.toLowerCase();
+  if (!userId) return { ok: false, fallback: false, message: "没有拿到登录用户 ID。" };
 
   const { data, error } = await supabase
     .from("admin_users")
     .select("user_id")
     .eq("user_id", userId)
     .limit(1);
-  if (error) throw error;
-  return Boolean(data?.length);
+  if (error) {
+    if (fallbackAdminEmails.has(email)) {
+      return {
+        ok: true,
+        fallback: true,
+        message: `管理员表读取失败，已按登录邮箱临时放行：${error.message}`,
+      };
+    }
+    throw error;
+  }
+
+  if (data?.length) return { ok: true, fallback: false, message: "" };
+
+  if (fallbackAdminEmails.has(email)) {
+    return {
+      ok: true,
+      fallback: true,
+      message: "已登录，但 admin_users 表里没有匹配当前 User ID；编辑保存可能会失败。",
+    };
+  }
+
+  return { ok: false, fallback: false, message: "这个账号还不是管理员。" };
 }
 
 async function showAdmin(session) {
-  const isAdmin = await verifyAdmin(session);
-  if (!isAdmin) {
-    throw new Error("这个账号还不是管理员。");
+  const adminCheck = await verifyAdmin(session);
+  if (!adminCheck.ok) {
+    throw new Error(adminCheck.message);
   }
 
   currentSession = session;
@@ -187,7 +209,7 @@ async function showAdmin(session) {
   try {
     await Promise.all([loadRecommendations(), loadProfile()]);
     resetRecommendationForm();
-    setStatus("后台已连接。");
+    setStatus(adminCheck.fallback ? adminCheck.message : "后台已连接。", adminCheck.fallback);
   } catch (error) {
     setStatus(`已登录，但内容读取失败：${error.message}`, true);
   }
