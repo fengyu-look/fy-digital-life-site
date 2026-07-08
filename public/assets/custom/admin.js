@@ -1,5 +1,88 @@
 import { recommendationPages, supabase } from "./site-supabase.js";
 
+const pageConfigs = {
+  "useful-websites": {
+    label: "实用网站",
+    defaultTitle: "超级链接宇宙",
+    defaultIntro: "数字世界的浩瀚星河里，我们为你打捞那些真正闪光的岛屿。",
+    defaultLayout: "grid",
+    itemTypes: [{ value: "website", label: "网页推荐" }],
+    fields: [
+      { key: "site_name", label: "网页名称", type: "text" },
+      { key: "pricing", label: "价格/状态", type: "text", placeholder: "Free / Paid / Freemium" },
+      { key: "recommend_reason", label: "推荐理由", type: "textarea" },
+      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VISIT SITE" },
+    ],
+    defaultSettings: { label: "CURATED LINKS" },
+  },
+  "prompt-collection": {
+    label: "提示词宇宙",
+    defaultTitle: "提示词宇宙",
+    defaultIntro: "收藏文生图、文生视频与图生图提示词。",
+    defaultLayout: "grid",
+    itemTypes: [{ value: "prompt", label: "提示词卡片" }],
+    fields: [
+      { key: "prompt_type", label: "提示词分类", type: "text", placeholder: "TEXT TO IMAGE" },
+      { key: "prompt", label: "完整提示词", type: "textarea", rows: 7 },
+      { key: "negative_prompt", label: "反向提示词", type: "textarea" },
+      { key: "model", label: "模型/工具", type: "text" },
+      { key: "copy_button_label", label: "复制按钮文案", type: "text", placeholder: "点击复制" },
+    ],
+    defaultSettings: { label: "PROMPT COLLECTION" },
+  },
+  "skill-workflow": {
+    label: "Skill 工具箱",
+    defaultTitle: "Skill 工具箱",
+    defaultIntro: "收藏常用 Skill 与组合工作流。",
+    defaultLayout: "grid",
+    itemTypes: [
+      { value: "skill", label: "Skill" },
+      { value: "workflow", label: "Workflow" },
+    ],
+    fields: [
+      { key: "skill_type", label: "类型标记", type: "select", options: ["SKILL", "WORKFLOW"] },
+      { key: "includes", label: "包含项，用逗号分隔", type: "csv", placeholder: "dbs-content, stop-slop" },
+      { key: "use_cases", label: "适用场景，每行一个", type: "lines" },
+      { key: "call_instruction", label: "调用说明", type: "text", placeholder: "/dbs-content" },
+      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VIEW ON GITHUB" },
+    ],
+    defaultSettings: { label: "SKILL / WORKFLOW" },
+  },
+  photography: {
+    label: "摄影页",
+    defaultTitle: "Scenes Held By Light",
+    defaultIntro: "一份关于静默画面的私人索引。",
+    defaultLayout: "photo-showcase",
+    itemTypes: [
+      { value: "photo", label: "照片" },
+      { value: "hero", label: "首屏视频/主视觉" },
+    ],
+    fields: [
+      { key: "ratio", label: "图片比例", type: "select", options: ["wide", "portrait", "square"] },
+      { key: "focus", label: "图片焦点", type: "text", placeholder: "center center" },
+      { key: "caption", label: "图片说明", type: "textarea" },
+      { key: "location", label: "地点", type: "text" },
+      { key: "shot_at", label: "拍摄时间", type: "text", placeholder: "2026-07" },
+    ],
+    defaultSettings: { label: "PHOTOGRAPHY / PERSONAL WORKS" },
+  },
+  "agent-guide": {
+    label: "Agent 安装教程",
+    defaultTitle: "Agent 工具安装教程库",
+    defaultIntro: "每张卡片都是一个 Agent 工具入口。",
+    defaultLayout: "paginated-guide",
+    itemTypes: [{ value: "agent_tutorial", label: "Agent 教程" }],
+    fields: [
+      { key: "difficulty", label: "难度", type: "text", placeholder: "入门 / 进阶" },
+      { key: "requirements", label: "前置要求，用逗号分隔", type: "csv" },
+      { key: "steps", label: "步骤 JSON", type: "json", rows: 8, placeholder: '[{"title":"安装","body":"..."}]' },
+      { key: "tool_links", label: "工具链接 JSON", type: "json", rows: 5, placeholder: '[{"label":"GitHub","url":"https://..."}]' },
+      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VIEW GUIDE" },
+    ],
+    defaultSettings: { label: "AGENT INSTALL GUIDE", page_size: 8 },
+  },
+};
+
 const els = {
   loginPanel: document.querySelector("#loginPanel"),
   adminPanel: document.querySelector("#adminPanel"),
@@ -8,6 +91,7 @@ const els = {
   sessionEmail: document.querySelector("#sessionEmail"),
   statusLine: document.querySelector("#statusLine"),
   pageFilter: document.querySelector("#pageFilter"),
+  contentPageForm: document.querySelector("#contentPageForm"),
   recommendationForm: document.querySelector("#recommendationForm"),
   recommendationList: document.querySelector("#recommendationList"),
   resetRecommendation: document.querySelector("#resetRecommendation"),
@@ -15,12 +99,14 @@ const els = {
   coverUpload: document.querySelector("#coverUpload"),
   avatarUpload: document.querySelector("#avatarUpload"),
   realPhotoUpload: document.querySelector("#realPhotoUpload"),
+  dynamicFields: document.querySelector("#dynamicFields"),
   recommendationsView: document.querySelector("#recommendationsView"),
   profileView: document.querySelector("#profileView"),
 };
 
 let currentSession = null;
-let recommendations = [];
+let contentPages = [];
+let contentItems = [];
 const fallbackAdminEmails = new Set(["fengyuaimengyu@outlook.com"]);
 
 function setStatus(message, isError = false) {
@@ -28,17 +114,57 @@ function setStatus(message, isError = false) {
   els.statusLine.style.color = isError ? "#b00020" : "";
 }
 
+function escapeHtml(value = "") {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
 function parseJson(value, fallback) {
-  const trimmed = value.trim();
+  const trimmed = String(value || "").trim();
   if (!trimmed) return fallback;
   return JSON.parse(trimmed);
 }
 
 function parseTags(value) {
-  return value
+  return String(value || "")
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function linesValue(value) {
+  return Array.isArray(value) ? value.join("\n") : String(value || "");
+}
+
+function csvValue(value) {
+  return Array.isArray(value) ? value.join(", ") : String(value || "");
+}
+
+function currentPageKey() {
+  return els.pageFilter.value;
+}
+
+function currentConfig() {
+  return pageConfigs[currentPageKey()];
+}
+
+function fallbackPage(pageKey) {
+  const config = pageConfigs[pageKey];
+  return {
+    page_key: pageKey,
+    title: config.defaultTitle,
+    intro: config.defaultIntro,
+    layout_type: config.defaultLayout,
+    settings: config.defaultSettings,
+    is_enabled: true,
+  };
+}
+
+function activePage() {
+  return contentPages.find((page) => page.page_key === currentPageKey()) || fallbackPage(currentPageKey());
 }
 
 function fillPageSelect(select) {
@@ -47,67 +173,153 @@ function fillPageSelect(select) {
     .join("");
 }
 
+function fillItemTypeSelect() {
+  const select = els.recommendationForm.elements.item_type;
+  select.innerHTML = currentConfig().itemTypes
+    .map((type) => `<option value="${type.value}">${type.label}</option>`)
+    .join("");
+}
+
 function mediaMarkup(url) {
   if (!url) return "";
   if (/\.(mp4|webm)(\?|$)/i.test(url)) {
-    return `<video src="${url}" muted playsinline preload="metadata"></video>`;
+    return `<video src="${escapeHtml(url)}" muted playsinline preload="metadata"></video>`;
   }
-  return `<img src="${url}" alt="">`;
+  return `<img src="${escapeHtml(url)}" alt="">`;
 }
 
-function recommendationPayload(form) {
-  const data = new FormData(form);
+function fieldInput(field, value = "") {
+  const name = `field:${field.key}`;
+  const safeValue = field.type === "json"
+    ? JSON.stringify(value || (field.key.endsWith("s") ? [] : {}), null, 2)
+    : field.type === "csv"
+      ? csvValue(value)
+      : field.type === "lines"
+        ? linesValue(value)
+        : String(value || "");
+
+  if (field.type === "textarea" || field.type === "json" || field.type === "lines") {
+    return `
+      <label class="wide">
+        ${escapeHtml(field.label)}
+        <textarea name="${name}" rows="${field.rows || 4}" placeholder="${escapeHtml(field.placeholder || "")}">${escapeHtml(safeValue)}</textarea>
+      </label>
+    `;
+  }
+
+  if (field.type === "select") {
+    return `
+      <label>
+        ${escapeHtml(field.label)}
+        <select name="${name}">
+          ${(field.options || []).map((option) => `<option value="${escapeHtml(option)}"${option === safeValue ? " selected" : ""}>${escapeHtml(option)}</option>`).join("")}
+        </select>
+      </label>
+    `;
+  }
+
+  return `
+    <label>
+      ${escapeHtml(field.label)}
+      <input name="${name}" value="${escapeHtml(safeValue)}" placeholder="${escapeHtml(field.placeholder || "")}">
+    </label>
+  `;
+}
+
+function renderDynamicFields(data = {}) {
+  els.dynamicFields.innerHTML = currentConfig().fields
+    .map((field) => fieldInput(field, data[field.key]))
+    .join("");
+}
+
+function dynamicDataFromForm(form) {
+  const base = parseJson(form.elements.data_json.value, {});
+  currentConfig().fields.forEach((field) => {
+    const raw = form.elements[`field:${field.key}`]?.value ?? "";
+    if (field.type === "csv") {
+      base[field.key] = parseTags(raw);
+      return;
+    }
+    if (field.type === "lines") {
+      base[field.key] = raw.split("\n").map((line) => line.trim()).filter(Boolean);
+      return;
+    }
+    if (field.type === "json") {
+      base[field.key] = parseJson(raw, field.key.endsWith("s") ? [] : {});
+      return;
+    }
+    base[field.key] = raw.trim();
+  });
+  return base;
+}
+
+function contentItemPayload(form) {
+  const pageKey = currentPageKey();
   return {
-    page_key: data.get("page_key"),
-    title: data.get("title").trim(),
-    description: data.get("description").trim(),
-    cover_url: data.get("cover_url").trim() || null,
-    link_url: data.get("link_url").trim() || null,
-    category: data.get("category").trim() || null,
-    tags: parseTags(data.get("tags")),
-    extra: parseJson(data.get("extra"), {}),
-    sort_order: Number(data.get("sort_order") || 0),
-    is_published: data.get("is_published") === "on",
+    page_key: pageKey,
+    item_type: form.elements.item_type.value,
+    title: form.elements.title.value.trim(),
+    summary: form.elements.description.value.trim(),
+    cover_url: form.elements.cover_url.value.trim() || null,
+    link_url: form.elements.link_url.value.trim() || null,
+    tags: parseTags(form.elements.tags.value),
+    sort_order: Number(form.elements.sort_order.value || 0),
+    layout_variant: form.elements.layout_variant.value,
+    is_published: form.elements.is_published.checked,
+    data: dynamicDataFromForm(form),
   };
 }
 
 function resetRecommendationForm() {
   els.recommendationForm.reset();
   els.recommendationForm.elements.id.value = "";
-  els.recommendationForm.elements.page_key.value = els.pageFilter.value;
+  els.recommendationForm.elements.page_key.value = currentPageKey();
   els.recommendationForm.elements.sort_order.value = "0";
+  els.recommendationForm.elements.layout_variant.value = "normal";
   els.recommendationForm.elements.is_published.checked = true;
-  els.recommendationForm.elements.extra.value = "";
+  fillItemTypeSelect();
+  renderDynamicFields({});
+  els.recommendationForm.elements.data_json.value = "{}";
 }
 
-function editRecommendation(item) {
+function fillPageForm() {
+  const page = activePage();
+  const form = els.contentPageForm;
+  form.elements.title.value = page.title || "";
+  form.elements.intro.value = page.intro || "";
+  form.elements.layout_type.value = page.layout_type || currentConfig().defaultLayout;
+  form.elements.settings.value = JSON.stringify(page.settings || currentConfig().defaultSettings, null, 2);
+  form.elements.is_enabled.checked = Boolean(page.is_enabled);
+}
+
+function editContentItem(item) {
   const form = els.recommendationForm;
   form.elements.id.value = item.id;
   form.elements.page_key.value = item.page_key;
+  form.elements.item_type.value = item.item_type;
   form.elements.sort_order.value = item.sort_order ?? 0;
   form.elements.title.value = item.title ?? "";
-  form.elements.description.value = item.description ?? "";
-  form.elements.category.value = item.category ?? "";
+  form.elements.description.value = item.summary ?? "";
   form.elements.link_url.value = item.link_url ?? "";
   form.elements.cover_url.value = item.cover_url ?? "";
   form.elements.tags.value = (item.tags ?? []).join(", ");
-  form.elements.extra.value = JSON.stringify(item.extra ?? {}, null, 2);
+  form.elements.layout_variant.value = item.layout_variant ?? "normal";
   form.elements.is_published.checked = Boolean(item.is_published);
+  renderDynamicFields(item.data || {});
+  form.elements.data_json.value = JSON.stringify(item.data || {}, null, 2);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-async function deleteRecommendation(id) {
-  if (!window.confirm("确定删除这张卡片吗？")) return;
-  const { error } = await supabase.from("recommendations").delete().eq("id", id);
+async function deleteContentItem(id) {
+  if (!window.confirm("确定删除这条内容吗？")) return;
+  const { error } = await supabase.from("content_items").delete().eq("id", id);
   if (error) throw error;
-  setStatus("已删除卡片。");
-  await loadRecommendations();
+  setStatus("已删除内容。");
+  await loadContentItems();
 }
 
-function renderRecommendations() {
-  const pageKey = els.pageFilter.value;
-  const items = recommendations.filter((item) => item.page_key === pageKey);
-
+function renderContentItems() {
+  const items = contentItems.filter((item) => item.page_key === currentPageKey());
   if (!items.length) {
     els.recommendationList.innerHTML = `<p class="status-line">这个页面还没有后台卡片。前台会继续显示当前静态内容。</p>`;
     return;
@@ -118,9 +330,10 @@ function renderRecommendations() {
       <article class="data-card" data-id="${item.id}">
         <div class="data-card__media">${mediaMarkup(item.cover_url)}</div>
         <div>
-          <div class="data-card__meta">${item.category || item.page_key} · ${item.is_published ? "已发布" : "草稿"}</div>
-          <h3>${item.title}</h3>
-          <p>${item.description || ""}</p>
+          <div class="data-card__meta">#${Number(item.sort_order || 0)} · ${escapeHtml(item.item_type)} · ${item.is_published ? "已发布" : "已隐藏"}</div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.summary || "")}</p>
+          <div class="data-card__tags">${(item.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
         </div>
         <div class="data-card__actions">
           <button class="ghost-button" type="button" data-action="edit">编辑</button>
@@ -131,15 +344,22 @@ function renderRecommendations() {
     .join("");
 }
 
-async function loadRecommendations() {
+async function loadContentPages() {
+  const { data, error } = await supabase.from("content_pages").select("*").order("page_key");
+  if (error) throw error;
+  contentPages = data ?? [];
+  fillPageForm();
+}
+
+async function loadContentItems() {
   const { data, error } = await supabase
-    .from("recommendations")
+    .from("content_items")
     .select("*")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
   if (error) throw error;
-  recommendations = data ?? [];
-  renderRecommendations();
+  contentItems = data ?? [];
+  renderContentItems();
 }
 
 async function loadProfile() {
@@ -196,9 +416,7 @@ async function verifyAdmin(session) {
 
 async function showAdmin(session) {
   const adminCheck = await verifyAdmin(session);
-  if (!adminCheck.ok) {
-    throw new Error(adminCheck.message);
-  }
+  if (!adminCheck.ok) throw new Error(adminCheck.message);
 
   currentSession = session;
   els.loginPanel.hidden = true;
@@ -207,7 +425,7 @@ async function showAdmin(session) {
   els.sessionEmail.textContent = session.user.email;
 
   try {
-    await Promise.all([loadRecommendations(), loadProfile()]);
+    await Promise.all([loadContentPages(), loadContentItems(), loadProfile()]);
     resetRecommendationForm();
     setStatus(adminCheck.fallback ? adminCheck.message : "后台已连接。", adminCheck.fallback);
   } catch (error) {
@@ -227,10 +445,7 @@ async function uploadToStorage(file, folder) {
   if (!file) return "";
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
   const filePath = `admin-uploads/${folder}/${Date.now()}-${safeName}`;
-  const { error } = await supabase.storage.from("site-media").upload(filePath, file, {
-    cacheControl: "31536000",
-    upsert: false,
-  });
+  const { error } = await supabase.storage.from("site-media").upload(filePath, file);
   if (error) throw error;
 
   const { data } = supabase.storage.from("site-media").getPublicUrl(filePath);
@@ -247,6 +462,8 @@ function switchView(view) {
 
 fillPageSelect(els.pageFilter);
 fillPageSelect(els.recommendationForm.elements.page_key);
+fillItemTypeSelect();
+renderDynamicFields({});
 
 els.loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -280,8 +497,32 @@ document.querySelectorAll(".nav-button").forEach((button) => {
 });
 
 els.pageFilter.addEventListener("change", () => {
-  renderRecommendations();
+  fillItemTypeSelect();
+  fillPageForm();
+  renderContentItems();
   resetRecommendationForm();
+});
+
+els.contentPageForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  setStatus("正在保存页面配置...");
+  try {
+    const form = event.currentTarget;
+    const payload = {
+      page_key: currentPageKey(),
+      title: form.elements.title.value.trim(),
+      intro: form.elements.intro.value.trim(),
+      layout_type: form.elements.layout_type.value,
+      settings: parseJson(form.elements.settings.value, {}),
+      is_enabled: form.elements.is_enabled.checked,
+    };
+    const { error } = await supabase.from("content_pages").upsert(payload);
+    if (error) throw error;
+    await loadContentPages();
+    setStatus("页面配置已保存。");
+  } catch (error) {
+    setStatus(error.message, true);
+  }
 });
 
 els.resetRecommendation.addEventListener("click", resetRecommendationForm);
@@ -325,17 +566,17 @@ els.realPhotoUpload.addEventListener("change", async (event) => {
 
 els.recommendationForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  setStatus("正在保存卡片...");
+  setStatus("正在保存内容...");
   try {
-    const payload = recommendationPayload(event.currentTarget);
+    const payload = contentItemPayload(event.currentTarget);
     const id = event.currentTarget.elements.id.value;
     const request = id
-      ? supabase.from("recommendations").update(payload).eq("id", id)
-      : supabase.from("recommendations").insert(payload);
+      ? supabase.from("content_items").update(payload).eq("id", id)
+      : supabase.from("content_items").insert(payload);
     const { error } = await request;
     if (error) throw error;
-    setStatus("卡片已保存。");
-    await loadRecommendations();
+    setStatus("内容已保存。");
+    await loadContentItems();
     resetRecommendationForm();
   } catch (error) {
     setStatus(error.message, true);
@@ -347,12 +588,12 @@ els.recommendationList.addEventListener("click", async (event) => {
   const card = event.target.closest(".data-card");
   if (!button || !card) return;
 
-  const item = recommendations.find((entry) => entry.id === card.dataset.id);
+  const item = contentItems.find((entry) => entry.id === card.dataset.id);
   if (!item) return;
 
   try {
-    if (button.dataset.action === "edit") editRecommendation(item);
-    if (button.dataset.action === "delete") await deleteRecommendation(item.id);
+    if (button.dataset.action === "edit") editContentItem(item);
+    if (button.dataset.action === "delete") await deleteContentItem(item.id);
   } catch (error) {
     setStatus(error.message, true);
   }

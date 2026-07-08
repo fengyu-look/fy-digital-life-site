@@ -158,6 +158,14 @@ h2 {
   margin-bottom: 22px;
 }
 
+.page-config-form {
+  background: rgba(5, 93, 255, 0.035);
+  border: 1px solid rgba(5, 93, 255, 0.16);
+  border-radius: 8px;
+  margin-bottom: 18px;
+  padding: 14px;
+}
+
 label {
   color: var(--muted);
   display: grid;
@@ -190,6 +198,16 @@ textarea {
   border: 1px dashed var(--line);
   border-radius: 6px;
   padding: 12px;
+}
+
+.dynamic-fields {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.dynamic-fields .wide {
+  grid-column: 1 / -1;
 }
 
 .check-line {
@@ -259,6 +277,22 @@ textarea {
   text-transform: uppercase;
 }
 
+.data-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.data-card__tags span {
+  background: rgba(5, 93, 255, 0.08);
+  border: 1px solid rgba(5, 93, 255, 0.14);
+  border-radius: 999px;
+  color: var(--blue);
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
 .data-card__actions {
   align-content: start;
   display: grid;
@@ -290,6 +324,7 @@ textarea {
 
   .admin-layout,
   .editor-grid,
+  .dynamic-fields,
   .data-card {
     grid-template-columns: 1fr;
   }

@@ -52,11 +52,46 @@
             <select id="pageFilter" aria-label="选择页面"></select>
           </div>
 
+          <form id="contentPageForm" class="editor-grid page-config-form">
+            <label>
+              页面标题
+              <input name="title" required>
+            </label>
+            <label>
+              布局类型
+              <select name="layout_type">
+                <option value="grid">普通网格</option>
+                <option value="hero-grid">大卡 + 小卡</option>
+                <option value="photo-showcase">摄影展示</option>
+                <option value="paginated-guide">分页教程</option>
+              </select>
+            </label>
+            <label class="wide">
+              页面介绍
+              <textarea name="intro" rows="3"></textarea>
+            </label>
+            <label class="wide">
+              页面配置 JSON
+              <textarea name="settings" rows="4" placeholder='{"label":"CURATED LINKS"}'></textarea>
+            </label>
+            <label class="check-line">
+              <input name="is_enabled" type="checkbox" checked>
+              启用这个页面的数据
+            </label>
+            <div class="form-actions wide">
+              <button class="ghost-button" type="submit">保存页面配置</button>
+            </div>
+          </form>
+
           <form id="recommendationForm" class="editor-grid">
             <input name="id" type="hidden">
             <label>
               所属页面
-              <select name="page_key" required></select>
+              <select name="page_key" required disabled></select>
+            </label>
+            <label>
+              内容类型
+              <select name="item_type" required></select>
             </label>
             <label>
               排序
@@ -90,9 +125,24 @@
               标签，用逗号分隔
               <input name="tags" placeholder="Mac, AI, Workflow">
             </label>
+            <label>
+              展示样式
+              <select name="layout_variant">
+                <option value="normal">普通</option>
+                <option value="featured">重点</option>
+                <option value="large">大卡</option>
+                <option value="small">小卡</option>
+                <option value="wide">横图</option>
+                <option value="portrait">竖图</option>
+              </select>
+            </label>
             <label class="wide">
-              额外 JSON
-              <textarea name="extra" rows="5" placeholder='{"prompt":"...","type":"SKILL"}'></textarea>
+              页面专属字段
+              <div id="dynamicFields" class="dynamic-fields"></div>
+            </label>
+            <label class="wide">
+              高级 JSON
+              <textarea name="data_json" rows="5" placeholder='{"prompt":"...","type":"SKILL"}'></textarea>
             </label>
             <label class="check-line">
               <input name="is_published" type="checkbox" checked>
