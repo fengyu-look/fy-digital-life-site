@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>FY Digital Life Admin</title>
+    <link rel="icon" href="/assets/custom/fy-digital-life-favicon-32.png">
+    <link rel="apple-touch-icon" href="/assets/custom/fy-digital-life-apple-touch-icon.png">
+    <link rel="stylesheet" href="/assets/custom/admin.css">
+  </head>
+  <body>
+    <main class="admin-shell">
+      <section class="admin-hero">
+        <div>
+          <p class="admin-kicker">FY Digital Life</p>
+          <h1>内容后台</h1>
+        </div>
+        <div class="admin-user">
+          <span id="sessionEmail">未登录</span>
+          <button id="logoutButton" class="ghost-button" type="button" hidden>退出</button>
+        </div>
+      </section>
+
+      <section id="loginPanel" class="panel auth-panel">
+        <h2>登录</h2>
+        <form id="loginForm" class="form-grid">
+          <label>
+            邮箱
+            <input name="email" type="email" autocomplete="email" required>
+          </label>
+          <label>
+            密码
+            <input name="password" type="password" autocomplete="current-password" required>
+          </label>
+          <button class="primary-button" type="submit">登录后台</button>
+        </form>
+      </section>
+
+      <section id="adminPanel" class="admin-layout" hidden>
+        <aside class="admin-nav">
+          <button class="nav-button is-active" type="button" data-view="recommendations">推荐卡片</button>
+          <button class="nav-button" type="button" data-view="profile">关于资料</button>
+        </aside>
+
+        <section id="recommendationsView" class="panel">
+          <div class="panel-title">
+            <div>
+              <h2>推荐卡片管理</h2>
+              <p>新增、编辑、删除 5 个推荐页里的卡片内容。</p>
+            </div>
+            <select id="pageFilter" aria-label="选择页面"></select>
+          </div>
+
+          <form id="recommendationForm" class="editor-grid">
+            <input name="id" type="hidden">
+            <label>
+              所属页面
+              <select name="page_key" required></select>
+            </label>
+            <label>
+              排序
+              <input name="sort_order" type="number" value="0">
+            </label>
+            <label class="wide">
+              标题
+              <input name="title" required>
+            </label>
+            <label class="wide">
+              描述
+              <textarea name="description" rows="3"></textarea>
+            </label>
+            <label>
+              分类
+              <input name="category" placeholder="AI / TOOL">
+            </label>
+            <label>
+              链接
+              <input name="link_url" type="url" placeholder="https://...">
+            </label>
+            <label class="wide">
+              封面 URL
+              <input name="cover_url" placeholder="/assets/... 或 https://...">
+            </label>
+            <label class="wide upload-line">
+              上传封面到 Supabase
+              <input id="coverUpload" type="file" accept="image/*,video/mp4,video/webm">
+            </label>
+            <label class="wide">
+              标签，用逗号分隔
+              <input name="tags" placeholder="Mac, AI, Workflow">
+            </label>
+            <label class="wide">
+              额外 JSON
+              <textarea name="extra" rows="5" placeholder='{"prompt":"...","type":"SKILL"}'></textarea>
+            </label>
+            <label class="check-line">
+              <input name="is_published" type="checkbox" checked>
+              发布
+            </label>
+            <div class="form-actions wide">
+              <button class="primary-button" type="submit">保存卡片</button>
+              <button id="resetRecommendation" class="ghost-button" type="button">新建空卡片</button>
+            </div>
+          </form>
+
+          <div id="recommendationList" class="card-list"></div>
+        </section>
+
+        <section id="profileView" class="panel" hidden>
+          <div class="panel-title">
+            <div>
+              <h2>关于页资料</h2>
+              <p>维护头像、真人照片、昵称、介绍和联系方式。</p>
+            </div>
+          </div>
+
+          <form id="profileForm" class="editor-grid">
+            <label>
+              昵称
+              <input name="nickname" required>
+            </label>
+            <label>
+              邮箱
+              <input name="email" type="email">
+            </label>
+            <label class="wide">
+              头像 URL
+              <input name="avatar_url">
+            </label>
+            <label class="wide upload-line">
+              上传头像
+              <input id="avatarUpload" type="file" accept="image/*">
+            </label>
+            <label class="wide">
+              真人照片 URL
+              <input name="real_photo_url">
+            </label>
+            <label class="wide upload-line">
+              上传真人照片
+              <input id="realPhotoUpload" type="file" accept="image/*">
+            </label>
+            <label class="wide">
+              个人介绍
+              <textarea name="intro" rows="5"></textarea>
+            </label>
+            <label class="wide">
+              联系方式 JSON
+              <textarea name="contacts" rows="4" placeholder='[{"label":"微信","value":"..."}]'></textarea>
+            </label>
+            <label class="wide">
+              社交链接 JSON
+              <textarea name="social_links" rows="4" placeholder='[{"label":"小红书","url":"https://..."}]'></textarea>
+            </label>
+            <div class="form-actions wide">
+              <button class="primary-button" type="submit">保存资料</button>
+            </div>
+          </form>
+        </section>
+      </section>
+
+      <p id="statusLine" class="status-line" role="status"></p>
+    </main>
+
+    <script type="module" src="/assets/custom/admin.js"></script>
+  </body>
+</html>

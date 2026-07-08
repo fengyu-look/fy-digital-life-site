@@ -1,0 +1,296 @@
+:root {
+  color-scheme: light;
+  --bg: #f4f4f4;
+  --panel: #ffffff;
+  --text: #242424;
+  --muted: #777;
+  --line: rgba(0, 0, 0, 0.12);
+  --blue: #055dff;
+  --blue-soft: rgba(5, 93, 255, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.admin-shell {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 32px 18px 80px;
+}
+
+.admin-hero,
+.panel,
+.admin-nav {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.admin-hero {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 22px;
+}
+
+.admin-kicker {
+  color: var(--blue);
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  letter-spacing: 0;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 500;
+  line-height: 1;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.admin-user {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.panel {
+  padding: 22px;
+}
+
+.auth-panel {
+  max-width: 520px;
+}
+
+.admin-layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 180px minmax(0, 1fr);
+}
+
+.admin-nav {
+  align-self: start;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+}
+
+.nav-button,
+.ghost-button,
+.primary-button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.nav-button {
+  background: transparent;
+  text-align: left;
+}
+
+.nav-button.is-active {
+  background: var(--blue-soft);
+  border-color: rgba(5, 93, 255, 0.35);
+  color: var(--blue);
+}
+
+.primary-button {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.ghost-button {
+  background: #fff;
+  color: var(--text);
+}
+
+.panel-title {
+  align-items: start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.panel-title p {
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+.form-grid,
+.editor-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.editor-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 22px;
+}
+
+label {
+  color: var(--muted);
+  display: grid;
+  font-size: 13px;
+  gap: 7px;
+}
+
+input,
+select,
+textarea {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  min-height: 40px;
+  padding: 10px 11px;
+  width: 100%;
+}
+
+textarea {
+  resize: vertical;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.upload-line {
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px dashed var(--line);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.check-line {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  gap: 9px;
+}
+
+.check-line input {
+  min-height: auto;
+  width: auto;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-list {
+  display: grid;
+  gap: 10px;
+}
+
+.data-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 88px minmax(0, 1fr) auto;
+  padding: 10px;
+}
+
+.data-card__media {
+  aspect-ratio: 1.2;
+  background: #eee;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.data-card__media img,
+.data-card__media video {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.data-card h3 {
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0 0 6px;
+}
+
+.data-card p {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.data-card__meta {
+  color: var(--blue);
+  font-family: "Courier New", monospace;
+  font-size: 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.data-card__actions {
+  align-content: start;
+  display: grid;
+  gap: 8px;
+}
+
+.danger-button {
+  background: #fff;
+  border: 1px solid rgba(210, 0, 0, 0.35);
+  border-radius: 6px;
+  color: #b00020;
+  cursor: pointer;
+  min-height: 36px;
+  padding: 0 12px;
+}
+
+.status-line {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+@media (max-width: 760px) {
+  .admin-hero,
+  .panel-title {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-layout,
+  .editor-grid,
+  .data-card {
+    grid-template-columns: 1fr;
+  }
+}
