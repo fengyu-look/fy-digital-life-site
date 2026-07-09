@@ -29,3 +29,18 @@ export function normalizeTags(value) {
 export function firstValue(...values) {
   return values.find((value) => value !== undefined && value !== null && value !== "");
 }
+
+export async function fetchProfile() {
+  const { data, error } = await supabase
+    .from("profile")
+    .select("*")
+    .eq("id", true)
+    .single();
+
+  if (error) {
+    console.warn("[FY Content] profile load failed:", error.message);
+    return null;
+  }
+
+  return data;
+}
