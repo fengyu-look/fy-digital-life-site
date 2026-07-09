@@ -91,6 +91,7 @@ const els = {
   sessionEmail: document.querySelector("#sessionEmail"),
   statusLine: document.querySelector("#statusLine"),
   pageFilter: document.querySelector("#pageFilter"),
+  contentSummary: document.querySelector("#contentSummary"),
   contentPageForm: document.querySelector("#contentPageForm"),
   recommendationForm: document.querySelector("#recommendationForm"),
   recommendationList: document.querySelector("#recommendationList"),
@@ -186,6 +187,16 @@ function mediaMarkup(url) {
     return `<video src="${escapeHtml(url)}" muted playsinline preload="metadata"></video>`;
   }
   return `<img src="${escapeHtml(url)}" alt="">`;
+}
+
+function summarizeItems(items) {
+  const published = items.filter((item) => item.is_published).length;
+  const hidden = items.length - published;
+  return [
+    { label: "全部卡片", value: items.length },
+    { label: "已发布", value: published },
+    { label: "已隐藏", value: hidden },
+  ];
 }
 
 function fieldInput(field, value = "") {
@@ -307,6 +318,7 @@ function editContentItem(item) {
   form.elements.is_published.checked = Boolean(item.is_published);
   renderDynamicFields(item.data || {});
   form.elements.data_json.value = JSON.stringify(item.data || {}, null, 2);
+  setStatus(`正在编辑：${item.title}`);
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -318,8 +330,58 @@ async function deleteContentItem(id) {
   await loadContentItems();
 }
 
+async function updateContentItem(id, payload, message) {
+  const { error } = await supabase.from("content_items").update(payload).eq("id", id);
+  if (error) throw error;
+  setStatus(message);
+  await loadContentItems();
+}
+
+async function togglePublish(item) {
+  await updateContentItem(
+    item.id,
+    { is_published: !item.is_published },
+    item.is_published ? "卡片已隐藏。" : "卡片已发布。",
+  );
+}
+
+async function moveContentItem(item, delta) {
+  const nextSort = Number(item.sort_order || 0) + delta;
+  await updateContentItem(item.id, { sort_order: nextSort }, "排序已更新。");
+}
+
+async function duplicateContentItem(item) {
+  const payload = {
+    page_key: item.page_key,
+    item_type: item.item_type,
+    title: `${item.title || "未命名卡片"} 副本`,
+    summary: item.summary,
+    cover_url: item.cover_url,
+    link_url: item.link_url,
+    tags: item.tags || [],
+    sort_order: Number(item.sort_order || 0) + 1,
+    layout_variant: item.layout_variant || "normal",
+    is_published: false,
+    data: item.data || {},
+  };
+  const { error } = await supabase.from("content_items").insert(payload);
+  if (error) throw error;
+  setStatus("已复制一张隐藏卡片。");
+  await loadContentItems();
+}
+
 function renderContentItems() {
   const items = contentItems.filter((item) => item.page_key === currentPageKey());
+  const summary = summarizeItems(items);
+  els.contentSummary.innerHTML = summary
+    .map((item) => `
+      <div class="summary-chip">
+        <span>${escapeHtml(item.label)}</span>
+        <strong>${item.value}</strong>
+      </div>
+    `)
+    .join("");
+
   if (!items.length) {
     els.recommendationList.innerHTML = `<p class="status-line">这个页面还没有后台卡片。前台会继续显示当前静态内容。</p>`;
     return;
@@ -330,12 +392,20 @@ function renderContentItems() {
       <article class="data-card" data-id="${item.id}">
         <div class="data-card__media">${mediaMarkup(item.cover_url)}</div>
         <div>
-          <div class="data-card__meta">#${Number(item.sort_order || 0)} · ${escapeHtml(item.item_type)} · ${item.is_published ? "已发布" : "已隐藏"}</div>
+          <div class="data-card__meta">
+            <span>#${Number(item.sort_order || 0)}</span>
+            <span>${escapeHtml(item.item_type)}</span>
+            <span class="state-pill ${item.is_published ? "is-live" : "is-hidden"}">${item.is_published ? "已发布" : "已隐藏"}</span>
+          </div>
           <h3>${escapeHtml(item.title)}</h3>
           <p>${escapeHtml(item.summary || "")}</p>
           <div class="data-card__tags">${(item.tags || []).map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
         </div>
         <div class="data-card__actions">
+          <button class="ghost-button" type="button" data-action="up">上移</button>
+          <button class="ghost-button" type="button" data-action="down">下移</button>
+          <button class="ghost-button" type="button" data-action="toggle">${item.is_published ? "隐藏" : "发布"}</button>
+          <button class="ghost-button" type="button" data-action="duplicate">复制</button>
           <button class="ghost-button" type="button" data-action="edit">编辑</button>
           <button class="danger-button" type="button" data-action="delete">删除</button>
         </div>
@@ -593,6 +663,10 @@ els.recommendationList.addEventListener("click", async (event) => {
 
   try {
     if (button.dataset.action === "edit") editContentItem(item);
+    if (button.dataset.action === "up") await moveContentItem(item, -10);
+    if (button.dataset.action === "down") await moveContentItem(item, 10);
+    if (button.dataset.action === "toggle") await togglePublish(item);
+    if (button.dataset.action === "duplicate") await duplicateContentItem(item);
     if (button.dataset.action === "delete") await deleteContentItem(item.id);
   } catch (error) {
     setStatus(error.message, true);

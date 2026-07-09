@@ -147,6 +147,34 @@ h2 {
   margin-top: 6px;
 }
 
+.content-summary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.summary-chip {
+  background: rgba(0, 0, 0, 0.025);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  min-height: 64px;
+  padding: 12px;
+}
+
+.summary-chip span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.summary-chip strong {
+  font-family: "Courier New", monospace;
+  font-size: 22px;
+  font-weight: 500;
+}
+
 .form-grid,
 .editor-grid {
   display: grid;
@@ -270,11 +298,34 @@ textarea {
 }
 
 .data-card__meta {
+  align-items: center;
   color: var(--blue);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
   font-family: "Courier New", monospace;
   font-size: 12px;
   margin-bottom: 6px;
   text-transform: uppercase;
+}
+
+.state-pill {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-size: 12px;
+  padding: 2px 7px;
+}
+
+.state-pill.is-live {
+  background: rgba(5, 93, 255, 0.08);
+  border-color: rgba(5, 93, 255, 0.2);
+  color: var(--blue);
+}
+
+.state-pill.is-hidden {
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .data-card__tags {
@@ -295,8 +346,16 @@ textarea {
 
 .data-card__actions {
   align-content: start;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-end;
+  max-width: 220px;
+}
+
+.data-card__actions button {
+  min-height: 34px;
+  padding-inline: 10px;
 }
 
 .danger-button {
@@ -325,7 +384,13 @@ textarea {
   .admin-layout,
   .editor-grid,
   .dynamic-fields,
+  .content-summary,
   .data-card {
     grid-template-columns: 1fr;
+  }
+
+  .data-card__actions {
+    justify-content: flex-start;
+    max-width: none;
   }
 }
