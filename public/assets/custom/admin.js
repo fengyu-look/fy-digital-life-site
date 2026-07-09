@@ -99,12 +99,15 @@ const els = {
   profileForm: document.querySelector("#profileForm"),
   coverUpload: document.querySelector("#coverUpload"),
   coverUploadInfo: document.querySelector("#coverUploadInfo"),
+  coverUploadProgress: document.querySelector("#coverUploadProgress"),
   coverPreview: document.querySelector("#coverPreview"),
   avatarUpload: document.querySelector("#avatarUpload"),
   avatarUploadInfo: document.querySelector("#avatarUploadInfo"),
+  avatarUploadProgress: document.querySelector("#avatarUploadProgress"),
   avatarPreview: document.querySelector("#avatarPreview"),
   realPhotoUpload: document.querySelector("#realPhotoUpload"),
   realPhotoUploadInfo: document.querySelector("#realPhotoUploadInfo"),
+  realPhotoUploadProgress: document.querySelector("#realPhotoUploadProgress"),
   realPhotoPreview: document.querySelector("#realPhotoPreview"),
   dynamicFields: document.querySelector("#dynamicFields"),
   recommendationsView: document.querySelector("#recommendationsView"),
@@ -613,15 +616,83 @@ function showLogin() {
   els.sessionEmail.textContent = "未登录";
 }
 
-async function uploadToStorage(file, folder) {
+const UPLOAD_ERRORS = {
+  "Payload too large": "文件超过了存储桶的大小限制。",
+  "duplicate": "文件名已被占用，请稍后重试。",
+  "not found": "存储桶不存在，请检查配置。",
+  "Unauthorized": "上传权限不足，请重新登录后再试。",
+  "JWT": "登录已过期，请重新登录后再上传。",
+  "network": "网络连接失败，请检查网络后重试。",
+  "row-level security": "没有操作权限，请确认管理员身份。",
+};
+
+function translateUploadError(error) {
+  if (!error) return "未知错误，请重试。";
+  const msg = (error.message || String(error)).trim();
+  for (const [key, trans] of Object.entries(UPLOAD_ERRORS)) {
+    if (msg.toLowerCase().includes(key.toLowerCase())) return `❌ ${trans}`;
+  }
+  return `❌ 上传失败：${msg}`;
+}
+
+function showProgress(progressEl, percent) {
+  if (!progressEl) return;
+  progressEl.hidden = percent >= 100;
+  progressEl.value = percent;
+}
+
+function hideProgress(progressEl) {
+  if (!progressEl) return;
+  progressEl.hidden = true;
+  progressEl.value = 0;
+}
+
+async function uploadToStorage(file, folder, progressEl) {
   if (!file) return "";
+  showProgress(progressEl, 0);
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
   const filePath = `admin-uploads/${folder}/${Date.now()}-${safeName}`;
-  const { error } = await supabase.storage.from("site-media").upload(filePath, file);
-  if (error) throw error;
+  const token = currentSession?.access_token || "";
 
-  const { data } = supabase.storage.from("site-media").getPublicUrl(filePath);
-  return data.publicUrl;
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/${encodeURIComponent("site-media")}/${encodeURIComponent(filePath)}`);
+    xhr.setRequestHeader("Authorization", `Bearer ${token}`);
+    xhr.setRequestHeader("apikey", SUPABASE_ANON_KEY);
+
+    xhr.upload.addEventListener("progress", (event) => {
+      if (event.lengthComputable) {
+        showProgress(progressEl, Math.round((event.loaded / event.total) * 100));
+      }
+    });
+
+    xhr.addEventListener("load", () => {
+      hideProgress(progressEl);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const publicUrl = `${SITE_MEDIA_BASE_URL}/${encodeURIComponent(filePath)}`;
+        resolve(publicUrl);
+      } else {
+        let errMsg = `上传失败 (${xhr.status})`;
+        try {
+          const body = JSON.parse(xhr.responseText);
+          errMsg = body.message || body.error || errMsg;
+        } catch (_) {}
+        reject(new Error(translateUploadError({ message: errMsg })));
+      }
+    });
+
+    xhr.addEventListener("error", () => {
+      hideProgress(progressEl);
+      reject(new Error(translateUploadError({ message: "network" })));
+    });
+
+    xhr.addEventListener("abort", () => {
+      hideProgress(progressEl);
+      reject(new Error("❌ 上传已取消。"));
+    });
+
+    xhr.send(file);
+  });
 }
 
 function switchView(view) {
@@ -705,12 +776,13 @@ els.coverUpload.addEventListener("change", async (event) => {
   setStatus("正在上传封面...");
   try {
     previewSelectedFile(file, els.coverPreview, els.coverUploadInfo, "封面预览");
-    const url = await uploadToStorage(file, "covers");
+    const url = await uploadToStorage(file, "covers", els.coverUploadProgress);
     els.recommendationForm.elements.cover_url.value = url;
     updateUploadedFilePreview(url, file, els.coverPreview, els.coverUploadInfo, "封面预览");
     setStatus("封面上传完成。");
   } catch (error) {
     event.currentTarget.value = "";
+    hideProgress(els.coverUploadProgress);
     els.coverUploadInfo.textContent = error.message;
     setStatus(error.message, true);
   }
@@ -722,12 +794,13 @@ els.avatarUpload.addEventListener("change", async (event) => {
   setStatus("正在上传头像...");
   try {
     previewSelectedFile(file, els.avatarPreview, els.avatarUploadInfo, "头像预览");
-    const url = await uploadToStorage(file, "profile");
+    const url = await uploadToStorage(file, "profile", els.avatarUploadProgress);
     els.profileForm.elements.avatar_url.value = url;
     updateUploadedFilePreview(url, file, els.avatarPreview, els.avatarUploadInfo, "头像预览");
     setStatus("头像上传完成。");
   } catch (error) {
     event.currentTarget.value = "";
+    hideProgress(els.avatarUploadProgress);
     els.avatarUploadInfo.textContent = error.message;
     setStatus(error.message, true);
   }
@@ -739,12 +812,13 @@ els.realPhotoUpload.addEventListener("change", async (event) => {
   setStatus("正在上传真人照片...");
   try {
     previewSelectedFile(file, els.realPhotoPreview, els.realPhotoUploadInfo, "真人照片预览");
-    const url = await uploadToStorage(file, "profile");
+    const url = await uploadToStorage(file, "profile", els.realPhotoUploadProgress);
     els.profileForm.elements.real_photo_url.value = url;
     updateUploadedFilePreview(url, file, els.realPhotoPreview, els.realPhotoUploadInfo, "真人照片预览");
     setStatus("真人照片上传完成。");
   } catch (error) {
     event.currentTarget.value = "";
+    hideProgress(els.realPhotoUploadProgress);
     els.realPhotoUploadInfo.textContent = error.message;
     setStatus(error.message, true);
   }
