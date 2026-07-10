@@ -87,13 +87,18 @@
       .filter(Boolean);
   }
 
+  function textFrom(value) {
+    if (Array.isArray(value)) return value.filter(Boolean).join(" ");
+    return value || "";
+  }
+
   function mapContentItem(item) {
     const data = item.data || {};
     const type = data.skill_type || item.item_type || "SKILL";
     return {
       type: String(type).toUpperCase(),
       title: item.title,
-      description: data.use_cases || item.summary || "",
+      description: textFrom(data.use_cases) || item.summary || "",
       meta: item.category || data.applicable_scene || "SKILL / WORKFLOW",
       image: item.cover_url || "/assets/custom/work-card-skill-web.mp4",
       includes: listFrom(data.includes).length ? listFrom(data.includes) : listFrom(item.tags),
