@@ -1808,7 +1808,8 @@ function seedDataForPage(pageKey, item) {
 
 function seedPayloadsForPage(pageKey) {
   return (staticContentSeeds[pageKey] || []).map((item, index) => {
-    const tags = item.meta
+    const tagSource = item.meta || item.group || "";
+    const tags = String(tagSource)
       .split("/")
       .map((tag) => tag.trim())
       .filter(Boolean);
