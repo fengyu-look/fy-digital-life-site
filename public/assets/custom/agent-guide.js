@@ -843,13 +843,13 @@
   function mapContentItem(item) {
     const data = item.data || {};
     const tags = listFrom(item.tags);
-    const requirements = listFrom(data.requirements);
+    const requirements = listFrom(data.prepare || data.requirements);
     const steps = stepsFrom(data.steps);
     const link = item.link_url || data.tool_url || "#";
 
     return {
       title: item.title,
-      group: item.category || "AGENT / GUIDE",
+      group: data.group || item.category || "AGENT / GUIDE",
       description: item.summary || "",
       tags: tags.length ? tags : ["Agent", "Guide"],
       difficulty: data.difficulty || "入门友好",
@@ -857,14 +857,14 @@
       success: data.success || "能按步骤完成一次验证。",
       source: link,
       guide: {
-        quick: steps.length ? steps.map((step) => step.text || step.code) : ["打开教程入口。", "按步骤完成配置。", "做一次最小验证。"],
+        quick: listFrom(data.quick).length ? listFrom(data.quick) : (steps.length ? steps.map((step) => step.text || step.code) : ["打开教程入口。", "按步骤完成配置。", "做一次最小验证。"]),
         what: data.what || item.summary || "这是一个可以通过后台维护的 Agent 教程卡片。",
         fit: data.use_cases || "适合需要按步骤安装、配置或理解这个工具的人。",
         prepare: requirements.length ? requirements : ["准备账号、网络环境和需要的 API Key。"],
-        mac: steps,
-        windows: steps,
+        mac: stepsFrom(data.mac).length ? stepsFrom(data.mac) : steps,
+        windows: stepsFrom(data.windows).length ? stepsFrom(data.windows) : steps,
         verify: listFrom(data.verify).length ? listFrom(data.verify) : ["完成一次打开、登录或调用测试。"],
-        deepseek: listFrom(data.call_instruction).length ? listFrom(data.call_instruction) : ["按工具文档填写模型、API Key 和 Base URL。"],
+        deepseek: listFrom(data.deepseek || data.call_instruction).length ? listFrom(data.deepseek || data.call_instruction) : ["按工具文档填写模型、API Key 和 Base URL。"],
         errors: listFrom(data.errors).length ? listFrom(data.errors) : ["如果失败，先检查账号、权限、网络和填写内容。"],
         sources: sourcesFrom(data.tool_links, link),
       },
