@@ -104,7 +104,7 @@ function rewriteText(text) {
     .replaceAll(`${origin}`, "/")
     .replaceAll('href="./about"', 'href="/studio/digital-life"')
     .replaceAll('href="./work"', 'href="/"')
-    .replaceAll('href="./concept-lab"', 'href="/studio/vibe-coding-lab"');
+    .replaceAll('href="./concept-lab"', 'href="/"');
 
   return out;
 }

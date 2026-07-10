@@ -8,7 +8,6 @@
     "/studio/skill-workflow",
     "/studio/photography",
     "/studio/agent-guide",
-    "/studio/vibe-coding-lab",
     "/studio/digital-life",
     "/prompt-template",
   ]);

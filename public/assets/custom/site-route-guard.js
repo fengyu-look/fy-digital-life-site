@@ -1,13 +1,13 @@
 (() => {
   const retiredRouteTargets = new Map([
-    ["/concept-lab", "/studio/vibe-coding-lab"],
+    ["/concept-lab", "/"],
     ["/about", "/studio/digital-life"],
     ["/orbit-mono", "/studio/useful-websites"],
     ["/a-swedish-cowboy", "/studio/prompt-collection"],
     ["/wurst-price-scenario", "/studio/skill-workflow"],
     ["/the-volatile-beerprice", "/studio/photography"],
     ["/jarvaveckan", "/studio/agent-guide"],
-    ["./concept-lab", "/studio/vibe-coding-lab"],
+    ["./concept-lab", "/"],
     ["./about", "/studio/digital-life"],
     ["./orbit-mono", "/studio/useful-websites"],
     ["./a-swedish-cowboy", "/studio/prompt-collection"],
@@ -23,7 +23,6 @@
     "/studio/skill-workflow",
     "/studio/photography",
     "/studio/agent-guide",
-    "/studio/vibe-coding-lab",
     "/studio/digital-life",
     "/prompt-template",
   ]);
@@ -54,7 +53,7 @@
   const pageChrome = new Map([
     ["/", {
       title: "FY Digital Life",
-      description: "丰胖子的个人网站，聚合稳定作品、Vibe Coding 实验和数字生命入口。",
+      description: "丰胖子的个人网站，聚合稳定作品、AI 推荐和数字生命入口。",
     }],
     ["/studio/useful-websites", {
       title: "FY Digital Life",
@@ -75,10 +74,6 @@
     ["/studio/agent-guide", {
       title: "FY Digital Life",
       description: "FY Studio practical guide for installing and choosing AI agent tools.",
-    }],
-    ["/studio/vibe-coding-lab", {
-      title: "FY Digital Life",
-      description: "Vibe Coding Lab is a reserved creative lab for prototypes, micro tools, and motion experiments.",
     }],
     ["/studio/digital-life", {
       title: "FY Digital Life",
@@ -244,7 +239,6 @@
       }
 
       const isRemovedNavItem =
-        path === "/studio/vibe-coding-lab" ||
         path === "/work" ||
         path === "/concept-lab" ||
         /^(作品|实验区|Work|Lab|Concept Lab)$/i.test(text);

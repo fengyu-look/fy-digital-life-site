@@ -5,7 +5,6 @@ export const canonicalNewRoutes = [
   "/studio/skill-workflow",
   "/studio/photography",
   "/studio/agent-guide",
-  "/studio/vibe-coding-lab",
   "/studio/digital-life",
 ];
 
@@ -55,12 +54,6 @@ export const canonicalPages = [
     route: "/studio/agent-guide",
     file: "public/studio/agent-guide/index.html",
     pageId: "new:agent-guide",
-    title: "FY Digital Life",
-  },
-  {
-    route: "/studio/vibe-coding-lab",
-    file: "public/studio/vibe-coding-lab/index.html",
-    pageId: "new:vibe-coding-lab",
     title: "FY Digital Life",
   },
   {

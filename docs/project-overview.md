@@ -63,7 +63,6 @@
 - `/studio/skill-workflow`
 - `/studio/photography`
 - `/studio/agent-guide`
-- `/studio/vibe-coding-lab`
 - `/studio/digital-life`
 
 其中 5 个推荐页已经接入后台内容读取：
@@ -108,7 +107,6 @@
 │       ├── skill-workflow/
 │       ├── photography/
 │       ├── agent-guide/
-│       ├── vibe-coding-lab/
 │       └── digital-life/
 ├── scripts/
 │   ├── build-site.mjs
