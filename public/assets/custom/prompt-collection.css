@@ -7,6 +7,10 @@
   display: none !important;
 }
 
+.prompt-recommendations-page .framer-i2qu3o-container {
+  pointer-events: none !important;
+}
+
 .prompt-recommendations-page [data-framer-name="case-nav-title"] {
   gap: 0 !important;
 }
@@ -140,6 +144,7 @@
   aspect-ratio: 1.35;
   background: #161819;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .prompt-card__media img,
@@ -164,6 +169,8 @@
   flex-direction: column;
   gap: 18px;
   padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .prompt-card__title {
@@ -202,6 +209,8 @@
   min-height: 44px;
   min-width: 132px;
   padding: 12px 18px;
+  position: relative;
+  z-index: 2;
   text-align: center;
   text-transform: none;
   transition:
@@ -222,7 +231,8 @@
 
 .prompt-card__copy::after {
   content: "";
-  display: none;
+  inset: -10px;
+  position: absolute;
 }
 
 .prompt-card:hover .prompt-card__copy,
