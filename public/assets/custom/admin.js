@@ -1381,6 +1381,8 @@ const staticContentSeeds = {
 
 };
 
+const placeholderStaticPages = new Set(["useful-websites", "prompt-collection", "skill-workflow"]);
+
 const els = {
   loginPanel: document.querySelector("#loginPanel"),
   adminPanel: document.querySelector("#adminPanel"),
@@ -1592,6 +1594,29 @@ function summarizeItems(items) {
     { label: "已发布", value: published },
     { label: "已隐藏", value: hidden },
   ];
+}
+
+function updateImportButtonState(items) {
+  if (!els.importStaticCards) return;
+
+  const pageKey = currentPageKey();
+  if (items.length) {
+    els.importStaticCards.disabled = true;
+    els.importStaticCards.textContent = "已接管后台，无需导入";
+    els.importStaticCards.title = "当前页面已经有后台卡片，继续用新增/编辑/复制来维护内容。";
+    return;
+  }
+
+  if (placeholderStaticPages.has(pageKey)) {
+    els.importStaticCards.disabled = true;
+    els.importStaticCards.textContent = "静态模板不导入";
+    els.importStaticCards.title = "这个页面的静态卡片是占位模板，请直接在后台新增真实卡片。";
+    return;
+  }
+
+  els.importStaticCards.disabled = false;
+  els.importStaticCards.textContent = "导入当前页静态卡片";
+  els.importStaticCards.title = "只在当前页面还没有后台数据时使用。";
 }
 
 function renderPageStatusGrid() {
@@ -1895,8 +1920,13 @@ async function importStaticCards() {
 
   const existingCount = contentItems.filter((item) => item.page_key === pageKey).length;
   if (existingCount) {
-    const ok = window.confirm(`这个页面后台已有 ${existingCount} 张卡片。继续导入会追加一组静态卡片，确定吗？`);
-    if (!ok) return;
+    setStatus(`这个页面已经有 ${existingCount} 张后台卡片，不再导入静态模板。请用新增、编辑、复制来维护。`, true);
+    return;
+  }
+
+  if (placeholderStaticPages.has(pageKey)) {
+    setStatus("这个页面的静态卡片是占位模板，不适合导入后台。请直接新增真实卡片。", true);
+    return;
   }
 
   setStatus(`正在导入 ${payloads.length} 张静态卡片...`);
@@ -1943,6 +1973,7 @@ async function normalizeCurrentPageSortOrder() {
 function renderContentItems() {
   const items = contentItems.filter((item) => item.page_key === currentPageKey());
   renderPageStatusGrid();
+  updateImportButtonState(items);
   const summary = summarizeItems(items);
   els.contentSummary.innerHTML = summary
     .map((item) => `
