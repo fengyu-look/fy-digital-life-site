@@ -232,6 +232,28 @@ const staticContentSeeds = {
       includes: ["skill-a", "skill-b", "skill-c"],
     },
   ],
+  photography: [
+    { title: "Photo 01", summary: "", cover_url: "/assets/custom/photography/fy-photo-02.jpg", link_url: "", meta: "wide", ratio: "wide", focus: "center center" },
+    { title: "Photo 02", summary: "", cover_url: "/assets/custom/photography/fy-photo-04.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 03", summary: "", cover_url: "/assets/custom/photography/fy-photo-01.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 04", summary: "", cover_url: "/assets/custom/photography/fy-photo-07.jpg", link_url: "", meta: "wide", ratio: "wide", focus: "center center" },
+    { title: "Photo 05", summary: "", cover_url: "/assets/custom/photography/fy-photo-17.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 06", summary: "", cover_url: "/assets/custom/photography/fy-photo-10.jpg", link_url: "", meta: "square", ratio: "square", focus: "center center" },
+    { title: "Photo 07", summary: "", cover_url: "/assets/custom/photography/fy-photo-05.jpg", link_url: "", meta: "wide", ratio: "wide", focus: "center center" },
+    { title: "Photo 08", summary: "", cover_url: "/assets/custom/photography/fy-photo-12.png", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 09", summary: "", cover_url: "/assets/custom/photography/fy-photo-08.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 10", summary: "", cover_url: "/assets/custom/photography/fy-photo-15.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 11", summary: "", cover_url: "/assets/custom/photography/fy-photo-18.jpg", link_url: "", meta: "wide", ratio: "wide", focus: "center center" },
+    { title: "Photo 12", summary: "", cover_url: "/assets/custom/photography/fy-photo-16.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 13", summary: "", cover_url: "/assets/custom/photography/fy-photo-06.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 14", summary: "", cover_url: "/assets/custom/photography/fy-photo-09.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 15", summary: "", cover_url: "/assets/custom/photography/fy-photo-13.png", link_url: "", meta: "wide", ratio: "wide", focus: "center center" },
+    { title: "Photo 16", summary: "", cover_url: "/assets/custom/photography/fy-photo-20.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 17", summary: "", cover_url: "/assets/custom/photography/fy-photo-03.jpg", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 18", summary: "", cover_url: "/assets/custom/photography/fy-photo-11.png", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 19", summary: "", cover_url: "/assets/custom/photography/fy-photo-14.png", link_url: "", meta: "portrait", ratio: "portrait", focus: "center center" },
+    { title: "Photo 20", summary: "", cover_url: "/assets/custom/photography/fy-photo-19.jpg", link_url: "", meta: "square", ratio: "square", focus: "center center" },
+  ],
   "agent-guide": [
     {
       "title": "Hermes Agent",
@@ -1793,6 +1815,17 @@ function seedDataForPage(pageKey, item) {
       errors: guide.errors || [],
       tool_links: guide.sources || [],
       button_label: "OPEN TUTORIAL",
+      migrated_from: `static-${pageKey}`,
+    };
+  }
+
+  if (pageKey === "photography") {
+    return {
+      ratio: item.ratio || item.meta || "wide",
+      focus: item.focus || "center center",
+      caption: item.summary || "",
+      location: "",
+      shot_at: "",
       migrated_from: `static-${pageKey}`,
     };
   }
