@@ -83,6 +83,53 @@ const pageConfigs = {
   },
 };
 
+const staticContentSeeds = {
+  "useful-websites": [
+    {
+      title: "Tool Name 01",
+      summary: "一句话写清楚这个网站最适合解决什么问题。",
+      cover_url: "/assets/custom/latest-work-card.png",
+      link_url: "https://example.com",
+      meta: "AI / PRODUCTIVITY",
+    },
+    {
+      title: "Tool Name 02",
+      summary: "适合放你想推荐给网友的实用网站说明。",
+      cover_url: "/assets/custom/ai-slogan-card.png",
+      link_url: "https://example.com",
+      meta: "DESIGN / IDEA",
+    },
+    {
+      title: "Tool Name 03",
+      summary: "这里可以替换成价格、用途或一句推荐理由。",
+      cover_url: "/assets/custom/about-card-cyber-20260704.png",
+      link_url: "https://example.com",
+      meta: "WEB / RESOURCE",
+    },
+    {
+      title: "Tool Name 04",
+      summary: "后续复制这一张卡片，替换文字、图片和链接。",
+      cover_url: "/assets/custom/work-card-photo-web.mp4",
+      link_url: "https://example.com",
+      meta: "REFERENCE / DAILY",
+    },
+    {
+      title: "Tool Name 05",
+      summary: "保持短句，整个页面会更像作品集里的推荐清单。",
+      cover_url: "/assets/custom/about-card-portrait-crop-20260704.png",
+      link_url: "https://example.com",
+      meta: "CREATIVE / TOOL",
+    },
+    {
+      title: "Tool Name 06",
+      summary: "如果没有图片，可以先换成统一风格的封面图。",
+      cover_url: "/assets/custom/work-card-skill-web.mp4",
+      link_url: "https://example.com",
+      meta: "LEARN / SAVE",
+    },
+  ],
+};
+
 const els = {
   loginPanel: document.querySelector("#loginPanel"),
   adminPanel: document.querySelector("#adminPanel"),
@@ -96,6 +143,7 @@ const els = {
   recommendationForm: document.querySelector("#recommendationForm"),
   recommendationList: document.querySelector("#recommendationList"),
   resetRecommendation: document.querySelector("#resetRecommendation"),
+  importStaticCards: document.querySelector("#importStaticCards"),
   profileForm: document.querySelector("#profileForm"),
   coverUpload: document.querySelector("#coverUpload"),
   coverUploadInfo: document.querySelector("#coverUploadInfo"),
@@ -473,6 +521,57 @@ async function duplicateContentItem(item) {
   await loadContentItems();
 }
 
+function seedPayloadsForPage(pageKey) {
+  return (staticContentSeeds[pageKey] || []).map((item, index) => {
+    const tags = item.meta
+      .split("/")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+
+    return {
+      page_key: pageKey,
+      item_type: pageConfigs[pageKey].itemTypes[0]?.value || "card",
+      title: item.title,
+      summary: item.summary,
+      cover_url: item.cover_url,
+      link_url: item.link_url,
+      tags,
+      sort_order: (index + 1) * 10,
+      layout_variant: "normal",
+      is_published: true,
+      data: {
+        site_name: item.title,
+        pricing: item.meta,
+        recommend_reason: item.summary,
+        button_label: "VISIT SITE",
+        migrated_from: `static-${pageKey}`,
+      },
+    };
+  });
+}
+
+async function importStaticCards() {
+  const pageKey = currentPageKey();
+  const payloads = seedPayloadsForPage(pageKey);
+  if (!payloads.length) {
+    setStatus("当前页面还没有内置静态卡片可导入。", true);
+    return;
+  }
+
+  const existingCount = contentItems.filter((item) => item.page_key === pageKey).length;
+  if (existingCount) {
+    const ok = window.confirm(`这个页面后台已有 ${existingCount} 张卡片。继续导入会追加一组静态卡片，确定吗？`);
+    if (!ok) return;
+  }
+
+  setStatus(`正在导入 ${payloads.length} 张静态卡片...`);
+  const { error } = await supabase.from("content_items").insert(payloads);
+  if (error) throw error;
+  await loadContentItems();
+  resetRecommendationForm();
+  setStatus(`已导入 ${payloads.length} 张静态卡片。前台会优先读取后台数据。`);
+}
+
 function renderContentItems() {
   const items = contentItems.filter((item) => item.page_key === currentPageKey());
   const summary = summarizeItems(items);
@@ -769,6 +868,14 @@ els.contentPageForm.addEventListener("submit", async (event) => {
 });
 
 els.resetRecommendation.addEventListener("click", resetRecommendationForm);
+
+els.importStaticCards.addEventListener("click", async () => {
+  try {
+    await importStaticCards();
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+});
 
 els.coverUpload.addEventListener("change", async (event) => {
   const file = event.currentTarget.files?.[0];
