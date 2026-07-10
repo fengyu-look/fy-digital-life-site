@@ -154,6 +154,53 @@ h2 {
   margin-bottom: 18px;
 }
 
+.page-status-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.page-status-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  gap: 7px;
+  min-height: 96px;
+  padding: 12px;
+  text-align: left;
+}
+
+.page-status-card.is-active {
+  background: var(--blue-soft);
+  border-color: rgba(5, 93, 255, 0.35);
+}
+
+.page-status-card__label {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.page-status-card__count {
+  color: var(--text);
+  font-family: "Courier New", monospace;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.page-status-card__meta {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.page-status-card__state {
+  color: var(--blue);
+  font-size: 12px;
+}
+
 .summary-chip {
   background: rgba(0, 0, 0, 0.025);
   border: 1px solid var(--line);
@@ -474,6 +521,7 @@ textarea {
   .editor-grid,
   .dynamic-fields,
   .content-summary,
+  .page-status-grid,
   .data-card {
     grid-template-columns: 1fr;
   }

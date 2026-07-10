@@ -1390,6 +1390,7 @@ const els = {
   statusLine: document.querySelector("#statusLine"),
   pageFilter: document.querySelector("#pageFilter"),
   contentSummary: document.querySelector("#contentSummary"),
+  pageStatusGrid: document.querySelector("#pageStatusGrid"),
   contentPageForm: document.querySelector("#contentPageForm"),
   recommendationForm: document.querySelector("#recommendationForm"),
   recommendationList: document.querySelector("#recommendationList"),
@@ -1591,6 +1592,27 @@ function summarizeItems(items) {
     { label: "已发布", value: published },
     { label: "已隐藏", value: hidden },
   ];
+}
+
+function renderPageStatusGrid() {
+  if (!els.pageStatusGrid) return;
+  const active = currentPageKey();
+  els.pageStatusGrid.innerHTML = recommendationPages
+    .map((page) => {
+      const items = contentItems.filter((item) => item.page_key === page.key);
+      const published = items.filter((item) => item.is_published).length;
+      const hidden = items.length - published;
+      const state = items.length ? "后台已接管" : "仍用静态兜底";
+      return `
+        <button class="page-status-card ${page.key === active ? "is-active" : ""}" type="button" data-page-key="${escapeHtml(page.key)}">
+          <span class="page-status-card__label">${escapeHtml(page.label)}</span>
+          <strong class="page-status-card__count">${items.length}</strong>
+          <span class="page-status-card__meta">${published} 发布 / ${hidden} 隐藏</span>
+          <span class="page-status-card__state">${state}</span>
+        </button>
+      `;
+    })
+    .join("");
 }
 
 function fieldInput(field, value = "") {
@@ -1920,6 +1942,7 @@ async function normalizeCurrentPageSortOrder() {
 
 function renderContentItems() {
   const items = contentItems.filter((item) => item.page_key === currentPageKey());
+  renderPageStatusGrid();
   const summary = summarizeItems(items);
   els.contentSummary.innerHTML = summary
     .map((item) => `
@@ -2157,6 +2180,13 @@ fillPageSelect(els.recommendationForm.elements.page_key);
 fillItemTypeSelect();
 renderDynamicFields({});
 
+function handlePageChange() {
+  fillItemTypeSelect();
+  fillPageForm();
+  renderContentItems();
+  resetRecommendationForm();
+}
+
 els.loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   setStatus("正在登录...");
@@ -2189,10 +2219,14 @@ document.querySelectorAll(".nav-button").forEach((button) => {
 });
 
 els.pageFilter.addEventListener("change", () => {
-  fillItemTypeSelect();
-  fillPageForm();
-  renderContentItems();
-  resetRecommendationForm();
+  handlePageChange();
+});
+
+els.pageStatusGrid?.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-page-key]");
+  if (!button) return;
+  els.pageFilter.value = button.dataset.pageKey;
+  handlePageChange();
 });
 
 els.contentPageForm.addEventListener("submit", async (event) => {
