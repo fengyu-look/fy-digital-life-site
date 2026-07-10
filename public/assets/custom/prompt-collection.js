@@ -49,7 +49,7 @@
 
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/assets/custom/prompt-collection.css?v=20260710b";
+    link.href = "/assets/custom/prompt-collection.css?v=20260710c";
     document.head.appendChild(link);
   }
 
