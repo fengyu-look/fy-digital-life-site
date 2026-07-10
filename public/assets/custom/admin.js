@@ -1,4 +1,10 @@
-import { recommendationPages, supabase } from "./site-supabase.js";
+import {
+  recommendationPages,
+  SITE_MEDIA_BASE_URL,
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+  supabase,
+} from "./site-supabase.js";
 
 const pageConfigs = {
   "useful-websites": {
@@ -746,6 +752,10 @@ function hideProgress(progressEl) {
   progressEl.value = 0;
 }
 
+function encodeStoragePath(filePath) {
+  return filePath.split("/").map(encodeURIComponent).join("/");
+}
+
 async function uploadToStorage(file, folder, progressEl) {
   if (!file) return "";
   showProgress(progressEl, 0);
@@ -755,7 +765,7 @@ async function uploadToStorage(file, folder, progressEl) {
 
   return new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
-    xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/${encodeURIComponent("site-media")}/${encodeURIComponent(filePath)}`);
+    xhr.open("POST", `${SUPABASE_URL}/storage/v1/object/site-media/${encodeStoragePath(filePath)}`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
     xhr.setRequestHeader("apikey", SUPABASE_ANON_KEY);
 
@@ -768,7 +778,7 @@ async function uploadToStorage(file, folder, progressEl) {
     xhr.addEventListener("load", () => {
       hideProgress(progressEl);
       if (xhr.status >= 200 && xhr.status < 300) {
-        const publicUrl = `${SITE_MEDIA_BASE_URL}/${encodeURIComponent(filePath)}`;
+        const publicUrl = `${SITE_MEDIA_BASE_URL}/${encodeStoragePath(filePath)}`;
         resolve(publicUrl);
       } else {
         let errMsg = `上传失败 (${xhr.status})`;
