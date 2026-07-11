@@ -7,7 +7,7 @@
     <title>FY Digital Life Admin</title>
     <link rel="icon" href="/assets/custom/fy-digital-life-favicon-32.png">
     <link rel="apple-touch-icon" href="/assets/custom/fy-digital-life-apple-touch-icon.png">
-    <link rel="stylesheet" href="/assets/custom/admin.css?v=20260711a">
+    <link rel="stylesheet" href="/assets/custom/admin.css?v=20260711b">
   </head>
   <body>
     <main class="admin-shell">
@@ -118,7 +118,10 @@
             </label>
             <label class="wide">
               封面 URL
-              <input name="cover_url" placeholder="/assets/... 或 https://...">
+              <span class="url-input-row">
+                <input name="cover_url" placeholder="/assets/... 或 https://...">
+                <button id="coverUrlPreviewButton" class="upload-preview-btn" type="button">预览</button>
+              </span>
             </label>
             <label class="wide upload-line">
               上传封面到 Supabase
@@ -196,7 +199,10 @@
             </label>
             <label class="wide">
               头像 URL
-              <input name="avatar_url">
+              <span class="url-input-row">
+                <input name="avatar_url">
+                <button id="avatarUrlPreviewButton" class="upload-preview-btn" type="button">预览</button>
+              </span>
             </label>
             <label class="wide upload-line">
               上传头像
@@ -207,7 +213,10 @@
             <div id="avatarPreview" class="media-preview wide is-compact" hidden></div>
             <label class="wide">
               真人照片 URL
-              <input name="real_photo_url">
+              <span class="url-input-row">
+                <input name="real_photo_url">
+                <button id="realPhotoUrlPreviewButton" class="upload-preview-btn" type="button">预览</button>
+              </span>
             </label>
             <label class="wide upload-line">
               上传真人照片
@@ -238,6 +247,6 @@
       <p id="statusLine" class="status-line" role="status"></p>
     </main>
 
-    <script type="module" src="/assets/custom/admin-agent-guide-import-20260710.js?v=20260711b"></script>
+    <script type="module" src="/assets/custom/admin-agent-guide-import-20260710.js?v=20260711c"></script>
   </body>
 </html>

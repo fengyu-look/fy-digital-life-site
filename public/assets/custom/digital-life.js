@@ -95,7 +95,7 @@
 
   async function hydrateProfile() {
     try {
-      const { fetchProfile } = await import("/assets/custom/content-api.js?v=20260709a");
+      const { fetchProfile } = await import("/assets/custom/content-api.js?v=20260711a");
       const profile = await fetchProfile();
       if (profile) applyProfile(profile);
     } catch (error) {

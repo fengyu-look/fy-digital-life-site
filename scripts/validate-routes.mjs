@@ -29,7 +29,6 @@ const obsoletePublicAssets = [
 const forbiddenPublicRoutes = [
   "about",
   "work",
-  "concept-lab",
   "orbit-mono",
   "a-swedish-cowboy",
   "wurst-price-scenario",
@@ -77,9 +76,6 @@ function collectPageIssues(page, html) {
     /Gustaf\s+Furusten/i,
     /gustaf[._-]furusten/i,
     /GULLERS/i,
-    /Concept Lab/i,
-    /concept\s+work\/ideas/i,
-    /\[\s*OO?3\s+CASES\s*\]/i,
     /A\s+SWEDISH\s+COWBOY/i,
     /WURST\s+PRICE\s+SCENARIO/i,
     /volatile\s+beerprice/i,

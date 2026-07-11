@@ -155,8 +155,11 @@
   }
 
   async function hydrateContent(section) {
+    if (!section || section.dataset.contentHydrated === "true" || section.dataset.contentHydrating === "true") return;
+    section.dataset.contentHydrating = "true";
+
     try {
-      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260711a");
       const items = await fetchPublishedContentItems("skill-workflow");
       if (!items.length) return;
 
@@ -164,8 +167,11 @@
       if (!grid) return;
       renderCards(grid, items.map(mapContentItem));
       revealCards(section);
+      section.dataset.contentHydrated = "true";
     } catch (error) {
       console.warn("[FY Content] skill-workflow fallback content used:", error);
+    } finally {
+      delete section.dataset.contentHydrating;
     }
   }
 
@@ -265,7 +271,11 @@
     normalizeHomeLinks();
     normalizeFooterWechatText();
 
-    if (document.querySelector(".skill-recommendations")) return true;
+    const existingSection = document.querySelector(".skill-recommendations");
+    if (existingSection) {
+      hydrateContent(existingSection);
+      return true;
+    }
 
     const header = document.querySelector('[data-framer-name="case-header"]');
     const fallback = document.querySelector('[data-framer-name="Video Case Section"]');
@@ -286,7 +296,12 @@
     if ("MutationObserver" in window) {
       const observer = new MutationObserver(() => {
         normalizeFooterWechatText();
-        if (!document.querySelector(".skill-recommendations")) init();
+        const section = document.querySelector(".skill-recommendations");
+        if (section) {
+          hydrateContent(section);
+          return;
+        }
+        init();
       });
       observer.observe(document.body, { childList: true, subtree: true });
       window.setTimeout(() => observer.disconnect(), 5000);

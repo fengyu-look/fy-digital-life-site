@@ -1,13 +1,11 @@
 (() => {
   const retiredRouteTargets = new Map([
-    ["/concept-lab", "/"],
     ["/about", "/studio/digital-life"],
     ["/orbit-mono", "/studio/useful-websites"],
     ["/a-swedish-cowboy", "/studio/prompt-collection"],
     ["/wurst-price-scenario", "/studio/skill-workflow"],
     ["/the-volatile-beerprice", "/studio/photography"],
     ["/jarvaveckan", "/studio/agent-guide"],
-    ["./concept-lab", "/"],
     ["./about", "/studio/digital-life"],
     ["./orbit-mono", "/studio/useful-websites"],
     ["./a-swedish-cowboy", "/studio/prompt-collection"],
@@ -24,6 +22,7 @@
     "/studio/photography",
     "/studio/agent-guide",
     "/studio/digital-life",
+    "/concept-lab",
     "/prompt-template",
   ]);
 
@@ -78,6 +77,10 @@
     ["/studio/digital-life", {
       title: "FY Digital Life",
       description: "FY Digital Life introduces 丰胖子, the digital-life layer, and contact entry points for the new site.",
+    }],
+    ["/concept-lab", {
+      title: "FY Digital Life",
+      description: "FY Digital Life concept lab for experimental prototypes and visual work-in-progress notes.",
     }],
   ]);
 
@@ -240,8 +243,7 @@
 
       const isRemovedNavItem =
         path === "/work" ||
-        path === "/concept-lab" ||
-        /^(作品|实验区|Work|Lab|Concept Lab)$/i.test(text);
+        /^(作品|Work)$/i.test(text);
 
       if (!isRemovedNavItem) return;
 
@@ -279,12 +281,11 @@
       .site-route-modal__panel {
         background: var(--token-26053b4a-f306-4fd1-996f-6d79fd5f13e3, #f4f4f4);
         color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
-        font-family: "Switzer", "Switzer Placeholder", sans-serif;
-        max-width: 520px;
-        padding: 22px;
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Switzer", "Switzer Placeholder", sans-serif;
+        max-width: 460px;
+        padding: 28px;
         position: relative;
-        text-transform: uppercase;
-        width: min(100%, 520px);
+        width: min(100%, 460px);
       }
 
       .site-route-modal__eyebrow,
@@ -299,12 +300,12 @@
       }
 
       .site-route-modal__title {
-        font-family: "Orbit Mono Regular", "Orbit Mono Regular Placeholder", monospace;
-        font-size: clamp(30px, 7vw, 58px);
-        font-weight: 400;
+        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+        font-size: clamp(26px, 5vw, 40px);
+        font-weight: 500;
         letter-spacing: 0;
-        line-height: 1;
-        margin: 48px 44px 20px 0;
+        line-height: 1.2;
+        margin: 28px 44px 0 0;
       }
 
       .site-route-modal__copy {
@@ -346,10 +347,9 @@
     modal.setAttribute("aria-labelledby", "site-route-modal-title");
     modal.innerHTML = `
       <div class="site-route-modal__panel" role="document">
-        <button class="site-route-modal__close" type="button" aria-label="Close">×</button>
-        <div class="site-route-modal__eyebrow">Archived route</div>
-        <h2 class="site-route-modal__title" id="site-route-modal-title">Still in the archive</h2>
-        <p class="site-route-modal__copy">This old Framer page is kept only as a private reference. New work needs a new studio route before it opens here.</p>
+        <button class="site-route-modal__close" type="button" aria-label="关闭">×</button>
+        <div class="site-route-modal__eyebrow">提示</div>
+        <h2 class="site-route-modal__title" id="site-route-modal-title">网页建设中......</h2>
       </div>
     `;
     document.body.appendChild(modal);

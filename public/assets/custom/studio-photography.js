@@ -169,17 +169,23 @@
   }
 
   async function hydrateContent(section) {
+    if (!section || section.dataset.contentHydrated === "true" || section.dataset.contentHydrating === "true") return;
+    section.dataset.contentHydrating = "true";
+
     try {
-      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260711a");
       const items = await fetchPublishedContentItems("photography");
       if (!items.length) return;
 
       const dynamicSection = buildSection(items.map(mapContentItem));
+      dynamicSection.dataset.contentHydrated = "true";
       section.replaceWith(dynamicSection);
       dynamicSection.querySelectorAll("video").forEach((video) => window.customVideoController?.observe?.(video));
       revealElements(dynamicSection);
     } catch (error) {
       console.warn("[FY Content] photography fallback content used:", error);
+    } finally {
+      delete section.dataset.contentHydrating;
     }
   }
 
@@ -259,7 +265,11 @@
     normalizeFooterWechatText();
     updateScrollVariable();
 
-    if (document.querySelector(".photography-showcase")) return true;
+    const existingSection = document.querySelector(".photography-showcase");
+    if (existingSection) {
+      hydrateContent(existingSection);
+      return true;
+    }
 
     const header = document.querySelector('[data-framer-name="case-header"]');
     const fallback = document.querySelector('[data-framer-name="Video Case Section"]');
@@ -282,7 +292,12 @@
     if ("MutationObserver" in window) {
       const observer = new MutationObserver(() => {
         normalizeFooterWechatText();
-        if (!document.querySelector(".photography-showcase")) init();
+        const section = document.querySelector(".photography-showcase");
+        if (section) {
+          hydrateContent(section);
+          return;
+        }
+        init();
       });
       observer.observe(document.body, { childList: true, subtree: true });
       window.setTimeout(() => observer.disconnect(), 5000);

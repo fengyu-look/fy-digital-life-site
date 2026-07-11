@@ -1407,14 +1407,17 @@ const els = {
   coverUploadInfo: document.querySelector("#coverUploadInfo"),
   coverUploadProgress: document.querySelector("#coverUploadProgress"),
   coverPreview: document.querySelector("#coverPreview"),
+  coverUrlPreviewButton: document.querySelector("#coverUrlPreviewButton"),
   avatarUpload: document.querySelector("#avatarUpload"),
   avatarUploadInfo: document.querySelector("#avatarUploadInfo"),
   avatarUploadProgress: document.querySelector("#avatarUploadProgress"),
   avatarPreview: document.querySelector("#avatarPreview"),
+  avatarUrlPreviewButton: document.querySelector("#avatarUrlPreviewButton"),
   realPhotoUpload: document.querySelector("#realPhotoUpload"),
   realPhotoUploadInfo: document.querySelector("#realPhotoUploadInfo"),
   realPhotoUploadProgress: document.querySelector("#realPhotoUploadProgress"),
   realPhotoPreview: document.querySelector("#realPhotoPreview"),
+  realPhotoUrlPreviewButton: document.querySelector("#realPhotoUrlPreviewButton"),
   dynamicFields: document.querySelector("#dynamicFields"),
   recommendationsView: document.querySelector("#recommendationsView"),
   profileView: document.querySelector("#profileView"),
@@ -1467,6 +1470,7 @@ function mediaElement(url, mime = "") {
 
 function renderUploadPreview(preview, url, meta = {}) {
   if (!preview || !url) return;
+  const publicUrl = /^(https?:|\/)/i.test(url) ? url : "";
   preview.hidden = false;
   preview.innerHTML = `
     ${mediaElement(url, meta.type || "")}
@@ -1474,6 +1478,7 @@ function renderUploadPreview(preview, url, meta = {}) {
       <strong>${escapeHtml(meta.title || "当前预览")}</strong>
       ${meta.detail ? `<span>${escapeHtml(meta.detail)}</span>` : ""}
       <code>${escapeHtml(meta.url || url)}</code>
+      ${publicUrl ? `<div class="media-preview__actions"><a href="${escapeHtml(publicUrl)}" target="_blank" rel="noopener">打开原图/视频</a></div>` : ""}
     </div>
   `;
 }
@@ -1514,12 +1519,20 @@ function renderUrlPreview(url, preview, title) {
   const clean = String(url || "").trim();
   if (!clean) {
     clearUploadPreview(preview);
-    return;
+    return false;
   }
   renderUploadPreview(preview, clean, {
     title,
     detail: "当前 URL 预览。",
     url: clean,
+  });
+  return true;
+}
+
+function bindUrlPreviewButton(button, input, preview, title) {
+  button?.addEventListener("click", () => {
+    const ok = renderUrlPreview(input?.value, preview, title);
+    setStatus(ok ? `${title}已刷新。` : "请先填写 URL，再点预览。", !ok);
   });
 }
 
@@ -2466,13 +2479,34 @@ els.recommendationForm.elements.cover_url.addEventListener("input", (event) => {
   renderUrlPreview(event.currentTarget.value, els.coverPreview, "封面 URL 预览");
 });
 
+bindUrlPreviewButton(
+  els.coverUrlPreviewButton,
+  els.recommendationForm.elements.cover_url,
+  els.coverPreview,
+  "封面 URL 预览",
+);
+
 els.profileForm.elements.avatar_url.addEventListener("input", (event) => {
   renderUrlPreview(event.currentTarget.value, els.avatarPreview, "头像 URL 预览");
 });
 
+bindUrlPreviewButton(
+  els.avatarUrlPreviewButton,
+  els.profileForm.elements.avatar_url,
+  els.avatarPreview,
+  "头像 URL 预览",
+);
+
 els.profileForm.elements.real_photo_url.addEventListener("input", (event) => {
   renderUrlPreview(event.currentTarget.value, els.realPhotoPreview, "真人照片 URL 预览");
 });
+
+bindUrlPreviewButton(
+  els.realPhotoUrlPreviewButton,
+  els.profileForm.elements.real_photo_url,
+  els.realPhotoPreview,
+  "真人照片 URL 预览",
+);
 
 window.addEventListener("pagehide", () => {
   objectUrls.forEach((url) => URL.revokeObjectURL(url));

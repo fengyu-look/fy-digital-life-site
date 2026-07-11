@@ -268,6 +268,13 @@ textarea {
   grid-column: 1 / -1;
 }
 
+.url-input-row {
+  align-items: stretch;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 .upload-line {
   background: rgba(0, 0, 0, 0.025);
   border: 1px dashed var(--line);
@@ -332,6 +339,22 @@ textarea {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.media-preview__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.media-preview__actions a {
+  border: 1px solid rgba(5, 93, 255, 0.28);
+  border-radius: 999px;
+  color: var(--blue);
+  font-size: 12px;
+  padding: 5px 10px;
+  text-decoration: none;
+  width: fit-content;
 }
 
 .dynamic-fields {
@@ -520,14 +543,14 @@ textarea {
 }
 
 .upload-preview-btn {
-  background: transparent;
+  background: #fff;
   border: 1px solid var(--blue);
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--blue);
   cursor: pointer;
   font-size: 12px;
-  margin-left: 8px;
-  padding: 4px 10px;
+  min-height: 40px;
+  padding: 0 14px;
   white-space: nowrap;
 }
 
@@ -544,6 +567,10 @@ textarea {
   .content-summary,
   .page-status-grid,
   .data-card {
+    grid-template-columns: 1fr;
+  }
+
+  .url-input-row {
     grid-template-columns: 1fr;
   }
 

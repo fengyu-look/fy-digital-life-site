@@ -154,8 +154,11 @@
   }
 
   async function hydrateContent(section) {
+    if (!section || section.dataset.contentHydrated === "true" || section.dataset.contentHydrating === "true") return;
+    section.dataset.contentHydrating = "true";
+
     try {
-      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260711a");
       const items = await fetchPublishedContentItems("prompt-collection");
       if (!items.length) return;
 
@@ -163,8 +166,11 @@
       if (!grid) return;
       renderCards(grid, items.map(mapContentItem));
       revealCards(section);
+      section.dataset.contentHydrated = "true";
     } catch (error) {
       console.warn("[FY Content] prompt-collection fallback content used:", error);
+    } finally {
+      delete section.dataset.contentHydrating;
     }
   }
 
@@ -264,7 +270,11 @@
     normalizeHomeLinks();
     normalizeFooterWechatText();
 
-    if (document.querySelector(".prompt-recommendations")) return true;
+    const existingSection = document.querySelector(".prompt-recommendations");
+    if (existingSection) {
+      hydrateContent(existingSection);
+      return true;
+    }
 
     const header = document.querySelector('[data-framer-name="case-header"]');
     const fallback = document.querySelector('[data-framer-name="Video Case Section"]');
@@ -285,7 +295,12 @@
     if ("MutationObserver" in window) {
       const observer = new MutationObserver(() => {
         normalizeFooterWechatText();
-        if (!document.querySelector(".prompt-recommendations")) init();
+        const section = document.querySelector(".prompt-recommendations");
+        if (section) {
+          hydrateContent(section);
+          return;
+        }
+        init();
       });
       observer.observe(document.body, { childList: true, subtree: true });
       window.setTimeout(() => observer.disconnect(), 5000);

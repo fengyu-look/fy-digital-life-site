@@ -6,6 +6,7 @@ export const canonicalNewRoutes = [
   "/studio/photography",
   "/studio/agent-guide",
   "/studio/digital-life",
+  "/concept-lab",
 ];
 
 export const retiredSlugs = [
@@ -60,6 +61,12 @@ export const canonicalPages = [
     route: "/studio/digital-life",
     file: "public/studio/digital-life/index.html",
     pageId: "new:digital-life-profile",
+    title: "FY Digital Life",
+  },
+  {
+    route: "/concept-lab",
+    file: "public/concept-lab/index.html",
+    pageId: "new:concept-lab",
     title: "FY Digital Life",
   },
 ];

@@ -1091,8 +1091,11 @@
   }
 
   async function hydrateContent(section) {
+    if (!section || section.dataset.contentHydrated === "true" || section.dataset.contentHydrating === "true") return;
+    section.dataset.contentHydrating = "true";
+
     try {
-      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260711a");
       const items = await fetchPublishedContentItems("agent-guide");
       if (!items.length) return;
 
@@ -1100,8 +1103,11 @@
       pages = Array.from({ length: Math.ceil(tools.length / pageSize) }, (_, index) => `Agent 教程 ${index + 1}`);
       currentPage = 0;
       renderPage(section);
+      section.dataset.contentHydrated = "true";
     } catch (error) {
       console.warn("[FY Content] agent-guide fallback content used:", error);
+    } finally {
+      delete section.dataset.contentHydrating;
     }
   }
 
@@ -1212,7 +1218,11 @@
     normalizeHomeLinks();
     normalizeFooterWechatText();
 
-    if (document.querySelector(".agent-guide")) return true;
+    const existingSection = document.querySelector(".agent-guide");
+    if (existingSection) {
+      hydrateContent(existingSection);
+      return true;
+    }
 
     const header = document.querySelector('[data-framer-name="case-header"]');
     const fallback = document.querySelector('[data-framer-name="Video Case Section"]');
@@ -1233,7 +1243,12 @@
       const observer = new MutationObserver(() => {
         normalizeAnimatedTitle();
         normalizeFooterWechatText();
-        if (!document.querySelector(".agent-guide")) init();
+        const section = document.querySelector(".agent-guide");
+        if (section) {
+          hydrateContent(section);
+          return;
+        }
+        init();
       });
       observer.observe(document.body, { childList: true, subtree: true });
       window.setTimeout(() => observer.disconnect(), 5000);

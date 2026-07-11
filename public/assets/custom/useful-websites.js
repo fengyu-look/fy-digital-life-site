@@ -93,8 +93,11 @@
   }
 
   async function hydrateContent(section) {
+    if (!section || section.dataset.contentHydrated === "true" || section.dataset.contentHydrating === "true") return;
+    section.dataset.contentHydrating = "true";
+
     try {
-      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260708a");
+      const { fetchPublishedContentItems } = await import("/assets/custom/content-api.js?v=20260711a");
       const items = await fetchPublishedContentItems("useful-websites");
       if (!items.length) return;
 
@@ -102,8 +105,11 @@
       if (!grid) return;
       renderCards(grid, items.map(mapContentItem));
       revealCards(section);
+      section.dataset.contentHydrated = "true";
     } catch (error) {
       console.warn("[FY Content] useful-websites fallback content used:", error);
+    } finally {
+      delete section.dataset.contentHydrating;
     }
   }
 
@@ -251,7 +257,11 @@
 
     const anchor = document.querySelector('[data-framer-name="Type-tester"]');
     if (!anchor) return false;
-    if (document.querySelector(".orbit-recommendations")) return true;
+    const existingSection = document.querySelector(".orbit-recommendations");
+    if (existingSection) {
+      hydrateContent(existingSection);
+      return true;
+    }
 
     const section = buildSection();
     anchor.parentNode.insertBefore(section, anchor);
@@ -266,7 +276,12 @@
 
     if ("MutationObserver" in window) {
       const observer = new MutationObserver(() => {
-        if (!document.querySelector(".orbit-recommendations")) init();
+        const section = document.querySelector(".orbit-recommendations");
+        if (section) {
+          hydrateContent(section);
+          return;
+        }
+        init();
       });
       observer.observe(document.body, { childList: true, subtree: true });
       window.setTimeout(() => observer.disconnect(), 5000);

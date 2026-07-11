@@ -1,0 +1,106 @@
+html.concept-lab-page,
+html.concept-lab-page body {
+  overflow-x: hidden;
+}
+
+html.concept-lab-page .framer-o081Z.framer-1oyt7zi {
+  max-width: 100%;
+  width: 100% !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-xzzgi9,
+html.concept-lab-page .framer-o081Z .framer-5xfo9u,
+html.concept-lab-page .framer-o081Z .framer-536uh4 {
+  padding-left: clamp(16px, 2vw, 24px) !important;
+  padding-right: clamp(16px, 2vw, 24px) !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-3lfq65,
+html.concept-lab-page .framer-o081Z .framer-2bs0e8,
+html.concept-lab-page .framer-o081Z .framer-1w7hxra {
+  max-width: 1400px !important;
+  width: 100% !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-1cma07k {
+  min-height: clamp(420px, 52vw, 650px);
+}
+
+html.concept-lab-page .concept-lab-share-title {
+  color: #f3f3f3 !important;
+  display: block !important;
+  font-family: "Doto Rounded Bold", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif !important;
+  font-size: clamp(34px, 5.5vw, 76px) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  line-height: 1.05 !important;
+  max-width: min(760px, 76vw) !important;
+  overflow-wrap: normal !important;
+  position: relative !important;
+  white-space: nowrap !important;
+  width: auto !important;
+  z-index: 3 !important;
+}
+
+html.concept-lab-page .concept-lab-share-meta-hidden {
+  display: none !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-536uh4 {
+  align-items: stretch !important;
+  flex-direction: column !important;
+  gap: clamp(28px, 4vw, 48px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: 1400px !important;
+  width: 100% !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-536uh4 > * {
+  flex: none !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-536uh4 .framer-14zxykh-container {
+  flex: none !important;
+  height: clamp(260px, 36vw, 480px) !important;
+  width: 100% !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-536uh4 .framer-7iz24m,
+html.concept-lab-page .framer-o081Z .framer-536uh4 .framer-ctd9o8 {
+  flex: none !important;
+  min-height: clamp(360px, 42vw, 540px) !important;
+  width: 100% !important;
+}
+
+html.concept-lab-page .framer-o081Z .framer-536uh4 img {
+  max-width: 100% !important;
+}
+
+html.concept-lab-page a.concept-lab-card-static {
+  cursor: default !important;
+}
+
+html.concept-lab-page a.concept-lab-card-static [data-framer-name*="btn"],
+html.concept-lab-page a.concept-lab-card-static [data-framer-name*="Button"],
+html.concept-lab-page a.concept-lab-card-static [data-framer-name*="go-to"] {
+  cursor: default !important;
+}
+
+html.concept-lab-page a.concept-lab-card-static:hover {
+  text-decoration: none !important;
+}
+
+@media (max-width: 809.98px) {
+  html.concept-lab-page .framer-o081Z .framer-xzzgi9 {
+    padding-top: 128px !important;
+  }
+
+  html.concept-lab-page .framer-o081Z .framer-1w7hxra,
+  html.concept-lab-page .framer-o081Z .framer-536uh4 {
+    gap: 28px !important;
+  }
+}
