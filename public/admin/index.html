@@ -7,7 +7,7 @@
     <title>FY Digital Life Admin</title>
     <link rel="icon" href="/assets/custom/fy-digital-life-favicon-32.png">
     <link rel="apple-touch-icon" href="/assets/custom/fy-digital-life-apple-touch-icon.png">
-    <link rel="stylesheet" href="/assets/custom/admin.css?v=20260710b">
+    <link rel="stylesheet" href="/assets/custom/admin.css?v=20260711a">
   </head>
   <body>
     <main class="admin-shell">
@@ -162,6 +162,18 @@
             </div>
           </form>
 
+          <section class="bulk-import-panel" aria-label="批量导入当前页卡片">
+            <div>
+              <h3>批量导入 JSON</h3>
+              <p>粘贴数组格式的卡片数据，会导入到当前选中的推荐页。</p>
+            </div>
+            <textarea id="bulkImportJson" rows="6" placeholder='[{"title":"卡片标题","summary":"一句话描述","cover_url":"https://...","link_url":"https://...","tags":["AI"],"data":{"prompt":"完整提示词"}}]'></textarea>
+            <div class="form-actions">
+              <button id="bulkImportCards" class="ghost-button" type="button">批量导入当前页</button>
+              <button id="clearBulkImport" class="ghost-button" type="button">清空</button>
+            </div>
+          </section>
+
           <div id="recommendationList" class="card-list"></div>
         </section>
 
@@ -226,6 +238,6 @@
       <p id="statusLine" class="status-line" role="status"></p>
     </main>
 
-    <script type="module" src="/assets/custom/admin-agent-guide-import-20260710.js?v=20260711a"></script>
+    <script type="module" src="/assets/custom/admin-agent-guide-import-20260710.js?v=20260711b"></script>
   </body>
 </html>

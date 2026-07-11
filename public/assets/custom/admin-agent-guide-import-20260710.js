@@ -1399,6 +1399,9 @@ const els = {
   resetRecommendation: document.querySelector("#resetRecommendation"),
   importStaticCards: document.querySelector("#importStaticCards"),
   normalizeSortOrder: document.querySelector("#normalizeSortOrder"),
+  bulkImportJson: document.querySelector("#bulkImportJson"),
+  bulkImportCards: document.querySelector("#bulkImportCards"),
+  clearBulkImport: document.querySelector("#clearBulkImport"),
   profileForm: document.querySelector("#profileForm"),
   coverUpload: document.querySelector("#coverUpload"),
   coverUploadInfo: document.querySelector("#coverUploadInfo"),
@@ -1919,6 +1922,89 @@ function seedPayloadsForPage(pageKey) {
   });
 }
 
+function tagsFromValue(value) {
+  if (Array.isArray(value)) return value.map(String).map((tag) => tag.trim()).filter(Boolean);
+  if (typeof value === "string") return parseTags(value);
+  return [];
+}
+
+function bulkDataForPage(pageKey, item) {
+  const data = { ...(item.data || {}) };
+  const fieldKeys = new Set((pageConfigs[pageKey]?.fields || []).map((field) => field.key));
+
+  Object.entries(item).forEach(([key, value]) => {
+    if (!fieldKeys.has(key)) return;
+    data[key] = value;
+  });
+
+  if (pageKey === "prompt-collection") {
+    data.prompt_type ||= item.prompt_type || item.meta || item.category || "TEXT TO IMAGE";
+    data.prompt ||= item.prompt || "";
+    data.copy_button_label ||= item.copy_button_label || "点击复制";
+  }
+
+  if (pageKey === "skill-workflow") {
+    data.skill_type ||= item.skill_type || item.type || item.item_type || "SKILL";
+    data.includes ||= tagsFromValue(item.includes);
+    data.use_cases ||= Array.isArray(item.use_cases)
+      ? item.use_cases
+      : String(item.use_cases || item.summary || "").split(/\n/).map((line) => line.trim()).filter(Boolean);
+    data.button_label ||= item.button_label || "VIEW ON GITHUB";
+  }
+
+  return data;
+}
+
+function bulkPayloadsForPage(pageKey, rawItems) {
+  const startSortOrder = nextSortOrderForCurrentPage();
+  const config = pageConfigs[pageKey];
+
+  return rawItems.map((item, index) => ({
+    page_key: pageKey,
+    item_type: item.item_type || item.type?.toLowerCase() || config.itemTypes[0]?.value || "card",
+    title: String(item.title || item.name || `未命名卡片 ${index + 1}`).trim(),
+    summary: String(item.summary || item.description || "").trim(),
+    cover_url: item.cover_url || item.image || item.cover || null,
+    link_url: item.link_url || item.url || item.href || null,
+    tags: tagsFromValue(item.tags || item.category || item.meta),
+    sort_order: Number(item.sort_order || startSortOrder + index * 10),
+    layout_variant: item.layout_variant || "normal",
+    is_published: item.is_published !== false,
+    data: bulkDataForPage(pageKey, item),
+  }));
+}
+
+async function bulkImportCards() {
+  const raw = els.bulkImportJson.value.trim();
+  if (!raw) {
+    setStatus("请先粘贴 JSON 数组。", true);
+    return;
+  }
+
+  const parsed = parseJson(raw, null);
+  if (!Array.isArray(parsed)) {
+    setStatus("批量导入需要 JSON 数组，例如 [{\"title\":\"...\"}]。", true);
+    return;
+  }
+
+  const payloads = bulkPayloadsForPage(currentPageKey(), parsed).filter((item) => item.title);
+  if (!payloads.length) {
+    setStatus("没有可导入的卡片，请检查 title/name 字段。", true);
+    return;
+  }
+
+  const ok = window.confirm(`将向当前页面导入 ${payloads.length} 张卡片，确定吗？`);
+  if (!ok) return;
+
+  setStatus(`正在批量导入 ${payloads.length} 张卡片...`);
+  const { error } = await supabase.from("content_items").insert(payloads);
+  if (error) throw error;
+  els.bulkImportJson.value = "";
+  await loadContentItems();
+  resetRecommendationForm();
+  setStatus(`已批量导入 ${payloads.length} 张卡片。`);
+}
+
 async function importStaticCards() {
   const pageKey = currentPageKey();
   const payloads = seedPayloadsForPage(pageKey);
@@ -2307,6 +2393,19 @@ els.normalizeSortOrder.addEventListener("click", async () => {
   } catch (error) {
     setStatus(error.message, true);
   }
+});
+
+els.bulkImportCards?.addEventListener("click", async () => {
+  try {
+    await bulkImportCards();
+  } catch (error) {
+    setStatus(error.message, true);
+  }
+});
+
+els.clearBulkImport?.addEventListener("click", () => {
+  els.bulkImportJson.value = "";
+  setStatus("批量导入输入框已清空。");
 });
 
 els.coverUpload.addEventListener("change", async (event) => {

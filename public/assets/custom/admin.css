@@ -362,6 +362,27 @@ textarea {
   gap: 10px;
 }
 
+.bulk-import-panel {
+  background: rgba(0, 0, 0, 0.018);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 14px;
+}
+
+.bulk-import-panel h3 {
+  font-size: 18px;
+  margin: 0 0 4px;
+}
+
+.bulk-import-panel p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+
 .card-list {
   display: grid;
   gap: 10px;
