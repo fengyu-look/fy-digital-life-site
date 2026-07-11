@@ -17,7 +17,7 @@ const pageConfigs = {
       { key: "site_name", label: "网页名称", type: "text" },
       { key: "pricing", label: "价格/状态", type: "text", placeholder: "Free / Paid / Freemium" },
       { key: "recommend_reason", label: "推荐理由", type: "textarea" },
-      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VISIT SITE" },
+      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VISIT SITE", defaultValue: "VISIT SITE" },
     ],
     defaultSettings: { label: "CURATED LINKS" },
   },
@@ -28,11 +28,11 @@ const pageConfigs = {
     defaultLayout: "grid",
     itemTypes: [{ value: "prompt", label: "提示词卡片" }],
     fields: [
-      { key: "prompt_type", label: "提示词分类", type: "text", placeholder: "TEXT TO IMAGE" },
+      { key: "prompt_type", label: "提示词分类", type: "text", placeholder: "TEXT TO IMAGE", defaultValue: "TEXT TO IMAGE" },
       { key: "prompt", label: "完整提示词", type: "textarea", rows: 7 },
       { key: "negative_prompt", label: "反向提示词", type: "textarea" },
       { key: "model", label: "模型/工具", type: "text" },
-      { key: "copy_button_label", label: "复制按钮文案", type: "text", placeholder: "点击复制" },
+      { key: "copy_button_label", label: "复制按钮文案", type: "text", placeholder: "点击复制", defaultValue: "点击复制" },
     ],
     defaultSettings: { label: "PROMPT COLLECTION" },
   },
@@ -46,11 +46,11 @@ const pageConfigs = {
       { value: "workflow", label: "Workflow" },
     ],
     fields: [
-      { key: "skill_type", label: "类型标记", type: "select", options: ["SKILL", "WORKFLOW"] },
+      { key: "skill_type", label: "类型标记", type: "select", options: ["SKILL", "WORKFLOW"], defaultValue: "SKILL" },
       { key: "includes", label: "包含项，用逗号分隔", type: "csv", placeholder: "dbs-content, stop-slop" },
       { key: "use_cases", label: "适用场景，每行一个", type: "lines" },
       { key: "call_instruction", label: "调用说明", type: "text", placeholder: "/dbs-content" },
-      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VIEW ON GITHUB" },
+      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VIEW ON GITHUB", defaultValue: "VIEW ON GITHUB" },
     ],
     defaultSettings: { label: "SKILL / WORKFLOW" },
   },
@@ -64,8 +64,8 @@ const pageConfigs = {
       { value: "hero", label: "首屏视频/主视觉" },
     ],
     fields: [
-      { key: "ratio", label: "图片比例", type: "select", options: ["wide", "portrait", "square"] },
-      { key: "focus", label: "图片焦点", type: "text", placeholder: "center center" },
+      { key: "ratio", label: "图片比例", type: "select", options: ["wide", "portrait", "square"], defaultValue: "wide" },
+      { key: "focus", label: "图片焦点", type: "text", placeholder: "center center", defaultValue: "center center" },
       { key: "caption", label: "图片说明", type: "textarea" },
       { key: "location", label: "地点", type: "text" },
       { key: "shot_at", label: "拍摄时间", type: "text", placeholder: "2026-07" },
@@ -93,7 +93,7 @@ const pageConfigs = {
       { key: "deepseek", label: "DeepSeek/国产模型接入，每行一项", type: "lines" },
       { key: "errors", label: "常见报错，每行一项", type: "lines" },
       { key: "tool_links", label: "工具链接 JSON", type: "json", rows: 5, placeholder: '[{"label":"GitHub","url":"https://..."}]' },
-      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VIEW GUIDE" },
+      { key: "button_label", label: "按钮文案", type: "text", placeholder: "VIEW GUIDE", defaultValue: "VIEW GUIDE" },
     ],
     defaultSettings: { label: "AGENT INSTALL GUIDE", page_size: 8 },
   },
@@ -1549,6 +1549,13 @@ function currentConfig() {
   return pageConfigs[currentPageKey()];
 }
 
+function nextSortOrderForCurrentPage() {
+  const maxSortOrder = contentItems
+    .filter((item) => item.page_key === currentPageKey())
+    .reduce((max, item) => Math.max(max, Number(item.sort_order || 0)), 0);
+  return maxSortOrder + 10;
+}
+
 function fallbackPage(pageKey) {
   const config = pageConfigs[pageKey];
   return {
@@ -1642,13 +1649,15 @@ function renderPageStatusGrid() {
 
 function fieldInput(field, value = "") {
   const name = `field:${field.key}`;
+  const hasValue = value !== undefined && value !== null && value !== "";
+  const fieldValue = hasValue ? value : field.defaultValue;
   const safeValue = field.type === "json"
-    ? JSON.stringify(value || (field.key.endsWith("s") ? [] : {}), null, 2)
+    ? JSON.stringify(fieldValue || (field.key.endsWith("s") ? [] : {}), null, 2)
     : field.type === "csv"
-      ? csvValue(value)
+      ? csvValue(fieldValue)
       : field.type === "lines"
-        ? linesValue(value)
-        : String(value || "");
+        ? linesValue(fieldValue)
+        : String(fieldValue || "");
 
   if (field.type === "textarea" || field.type === "json" || field.type === "lines") {
     return `
@@ -1726,7 +1735,7 @@ function resetRecommendationForm() {
   els.recommendationForm.reset();
   els.recommendationForm.elements.id.value = "";
   els.recommendationForm.elements.page_key.value = currentPageKey();
-  els.recommendationForm.elements.sort_order.value = "0";
+  els.recommendationForm.elements.sort_order.value = String(nextSortOrderForCurrentPage());
   els.recommendationForm.elements.layout_variant.value = "normal";
   els.recommendationForm.elements.is_published.checked = true;
   fillItemTypeSelect();
