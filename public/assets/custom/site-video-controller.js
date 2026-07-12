@@ -53,8 +53,7 @@
     video.removeAttribute("autoplay");
     video.setAttribute("preload", "none");
 
-    if (isNearViewport(video)) restoreSrc(video);
-    else releaseSrc(video);
+    releaseSrc(video);
   };
 
   const observer = canObserve
@@ -88,6 +87,13 @@
       play(video);
     }
     window.setTimeout(() => {
+      if (isNearViewport(video)) {
+        video.dataset.customVideoVisible = "true";
+        restoreSrc(video);
+        play(video);
+      }
+    }, 160);
+    window.setTimeout(() => {
       if (!isNearViewport(video)) {
         delete video.dataset.customVideoVisible;
         releaseSrc(video);
@@ -107,6 +113,18 @@
 
   window.customVideoController = { observe, play, prepare, hydrateAll };
 
+  const observeAddedVideos = () => {
+    new MutationObserver((entries) => {
+      entries.forEach((entry) => {
+        entry.addedNodes.forEach((node) => {
+          if (!(node instanceof Element)) return;
+          if (node.matches?.("video")) observe(node);
+          node.querySelectorAll?.("video").forEach(observe);
+        });
+      });
+    }).observe(document.documentElement, { childList: true, subtree: true });
+  };
+
   const scheduleHydrate = () => {
     window.setTimeout(hydrateAll, 600);
     window.setTimeout(hydrateAll, 1600);
@@ -114,4 +132,10 @@
 
   if (document.readyState === "complete") scheduleHydrate();
   else window.addEventListener("load", scheduleHydrate, { once: true });
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", observeAddedVideos, { once: true });
+  } else {
+    observeAddedVideos();
+  }
 })();

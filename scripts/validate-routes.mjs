@@ -49,6 +49,15 @@ async function exists(relativePath) {
   }
 }
 
+async function isRedirectStub(relativePath) {
+  try {
+    const html = await readFile(path.join(repo, relativePath, "index.html"), "utf8");
+    return /data-site-redirect-stub/.test(html);
+  } catch {
+    return false;
+  }
+}
+
 function routePattern(route) {
   const escaped = route.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   return new RegExp(`href=["'](?:${escaped}|\\.${escaped})/?(?:[?#][^"']*)?["']`, "i");
@@ -111,7 +120,9 @@ export async function validateRoutes() {
 
   for (const route of forbiddenPublicRoutes) {
     const publicDir = path.join("public", route);
-    if (await exists(publicDir)) failures.push(`${publicDir} must not exist in the new-site build`);
+    if ((await exists(publicDir)) && !(await isRedirectStub(publicDir))) {
+      failures.push(`${publicDir} must not exist in the new-site build unless it is a redirect stub`);
+    }
   }
 
   for (const asset of obsoletePublicAssets) {

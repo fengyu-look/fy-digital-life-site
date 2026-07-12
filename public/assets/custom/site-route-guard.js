@@ -14,6 +14,13 @@
     ["./jarvaveckan", "/studio/agent-guide"],
   ]);
 
+  const legacySiteHosts = new Set([
+    "fengyu-look.github.io",
+    "www.fengyu-look.github.io",
+    "127.0.0.1",
+    "localhost",
+  ]);
+
   const allowedPagePaths = new Set([
     "/",
     "/studio/useful-websites",
@@ -115,11 +122,16 @@
       return "";
     }
 
+    const path = normalizePath(url.pathname);
+    const retiredTarget = retiredRouteTargets.get(path);
+    if (retiredTarget && (url.origin === window.location.origin || legacySiteHosts.has(url.hostname))) {
+      return retiredTarget;
+    }
+
     if (url.origin !== window.location.origin) {
       return url.hostname.includes("linkedin.com") ? "/studio/digital-life" : "";
     }
 
-    const path = normalizePath(url.pathname);
     return retiredRouteTargets.get(path) || "";
   };
 
@@ -127,13 +139,20 @@
     if (href === "./" || href === ".") return { kind: "allowed", href: `${window.location.origin}/` };
 
     const rawPath = href.split(/[?#]/)[0].replace(/\/+$/, "") || "/";
-    if (retiredRouteTargets.has(rawPath)) return { kind: "archived" };
+    const rawRetiredTarget = retiredRouteTargets.get(rawPath);
+    if (rawRetiredTarget) return { kind: "redirect", href: `${window.location.origin}${rawRetiredTarget}` };
 
     let url;
     try {
       url = new URL(href, window.location.href);
     } catch {
       return { kind: "ignore" };
+    }
+
+    const path = normalizePath(url.pathname);
+    const retiredTarget = retiredRouteTargets.get(path);
+    if (retiredTarget && (url.origin === window.location.origin || legacySiteHosts.has(url.hostname))) {
+      return { kind: "redirect", href: `${window.location.origin}${retiredTarget}` };
     }
 
     if (url.origin !== window.location.origin) {
@@ -144,14 +163,12 @@
     }
     if (url.pathname.startsWith("/assets/")) return { kind: "asset" };
 
-    const path = normalizePath(url.pathname);
     const current = normalizePath(window.location.pathname);
-    if (retiredRouteTargets.has(path)) return { kind: "archived" };
 
     if (allowedPagePaths.has(path)) return { kind: "allowed", href: url.href };
     if (path === current && url.hash) return { kind: "same-page", href: url.href };
 
-    return { kind: "archived" };
+    return { kind: "unknown" };
   };
 
   function routeForContentEntry(link) {
@@ -257,126 +274,18 @@
     });
   }
 
-  function ensureModalStyles() {
-    if (document.getElementById("site-route-guard-style")) return;
-
-    const style = document.createElement("style");
-    style.id = "site-route-guard-style";
-    style.textContent = `
-      .site-route-modal {
-        align-items: center;
-        background: rgba(5, 5, 5, 0.54);
-        display: none;
-        inset: 0;
-        justify-content: center;
-        padding: 20px;
-        position: fixed;
-        z-index: 10000;
-      }
-
-      .site-route-modal.is-open {
-        display: flex;
-      }
-
-      .site-route-modal__panel {
-        background: var(--token-26053b4a-f306-4fd1-996f-6d79fd5f13e3, #f4f4f4);
-        color: var(--token-12ee3e6d-9f3d-4108-9f6a-d72af1339d46, #404040);
-        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Switzer", "Switzer Placeholder", sans-serif;
-        max-width: 460px;
-        padding: 28px;
-        position: relative;
-        width: min(100%, 460px);
-      }
-
-      .site-route-modal__eyebrow,
-      .site-route-modal__close {
-        font-family: "Doto Rounded Bold", "Doto Rounded Bold Placeholder", sans-serif;
-        font-weight: 700;
-      }
-
-      .site-route-modal__eyebrow {
-        color: var(--token-648d07ba-0cee-4673-90d9-650fc59b1a1f, #055dff);
-        font-size: 12px;
-      }
-
-      .site-route-modal__title {
-        font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-        font-size: clamp(26px, 5vw, 40px);
-        font-weight: 500;
-        letter-spacing: 0;
-        line-height: 1.2;
-        margin: 28px 44px 0 0;
-      }
-
-      .site-route-modal__copy {
-        color: rgba(64, 64, 64, 0.76);
-        font-size: 13px;
-        line-height: 1.5;
-      }
-
-      .site-route-modal__close {
-        appearance: none;
-        background: transparent;
-        border: 1px solid rgba(64, 64, 64, 0.25);
-        color: inherit;
-        cursor: pointer;
-        height: 38px;
-        line-height: 1;
-        position: absolute;
-        right: 22px;
-        top: 22px;
-        width: 38px;
-      }
-
-      body.site-route-modal-open {
-        overflow: hidden;
-      }
-    `;
-    document.head.appendChild(style);
-  }
-
-  function ensureModal() {
-    ensureModalStyles();
-    let modal = document.querySelector(".site-route-modal");
-    if (modal) return modal;
-
-    modal = document.createElement("div");
-    modal.className = "site-route-modal";
-    modal.setAttribute("role", "dialog");
-    modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-labelledby", "site-route-modal-title");
-    modal.innerHTML = `
-      <div class="site-route-modal__panel" role="document">
-        <button class="site-route-modal__close" type="button" aria-label="关闭">×</button>
-        <div class="site-route-modal__eyebrow">提示</div>
-        <h2 class="site-route-modal__title" id="site-route-modal-title">网页建设中......</h2>
-      </div>
-    `;
-    document.body.appendChild(modal);
-
-    modal.addEventListener("click", (event) => {
-      if (event.target === modal || event.target.closest(".site-route-modal__close")) closeArchiveModal();
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && modal.classList.contains("is-open")) closeArchiveModal();
-    });
-
-    return modal;
+  function redirectAwayFromArchivedRoute(fallbackRoute = "/") {
+    const nextRoute = allowedPagePaths.has(fallbackRoute) ? fallbackRoute : "/";
+    document.documentElement.dataset.siteRouteGuardLast = "archived-redirect";
+    window.location.assign(nextRoute);
   }
 
   function openArchiveModal() {
-    const modal = ensureModal();
-    modal.classList.add("is-open");
-    document.body.classList.add("site-route-modal-open");
-    modal.querySelector(".site-route-modal__close")?.focus();
+    document.documentElement.dataset.siteRouteGuardLast = "archived-ignored";
   }
 
   function closeArchiveModal() {
-    const modal = document.querySelector(".site-route-modal");
-    if (!modal) return;
-    modal.classList.remove("is-open");
-    document.body.classList.remove("site-route-modal-open");
+    document.documentElement.dataset.siteRouteGuardLast = "archived-closed";
   }
 
   function intercept(event) {
@@ -401,11 +310,12 @@
     }
 
     if (href === "#archived-project" || link.dataset.siteArchived === "true") {
-      document.documentElement.dataset.siteRouteGuardLast = "archived";
+      const fallbackRoute = routeForContentEntry(link) || "/";
+      document.documentElement.dataset.siteRouteGuardLast = fallbackRoute === "/" ? "archived-ignored" : "archived-redirect";
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation?.();
-      openArchiveModal();
+      if (fallbackRoute !== "/") redirectAwayFromArchivedRoute(fallbackRoute);
       return;
     }
 
@@ -430,11 +340,10 @@
       return;
     }
 
-    if (result.kind === "archived") {
+    if (result.kind === "unknown") {
       event.preventDefault();
       event.stopPropagation();
       event.stopImmediatePropagation?.();
-      openArchiveModal();
     }
   }
 
@@ -498,7 +407,10 @@
     normalizeRetiredText();
     removeWideFramerLineArtifacts();
     observeRouteMutations();
-    window.addEventListener("site:open-archive-modal", () => openArchiveModal());
+    window.addEventListener("site:open-archive-modal", (event) => {
+      event.preventDefault?.();
+      openArchiveModal();
+    });
     ["pointerdown", "mousedown", "click", "auxclick"].forEach((type) => {
       window.addEventListener(type, intercept, true);
       document.addEventListener(type, intercept, true);
@@ -519,6 +431,7 @@
     normalizeContentEntryLinks,
     normalizePrimaryNavigation,
     openArchiveModal,
+    redirectAwayFromArchivedRoute,
     removeWideFramerLineArtifacts,
   };
 
