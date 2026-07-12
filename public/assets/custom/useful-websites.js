@@ -25,7 +25,7 @@
       title: "Tool Name 04",
       description: "后续复制这一张卡片，替换文字、图片和链接。",
       href: "https://example.com",
-      image: "/assets/custom/work-card-photo-web.mp4",
+      image: "/assets/custom/work-card-photo-lite.mp4",
       meta: "REFERENCE / DAILY",
     },
     {
@@ -39,7 +39,7 @@
       title: "Tool Name 06",
       description: "如果没有图片，可以先换成统一风格的封面图。",
       href: "https://example.com",
-      image: "/assets/custom/work-card-skill-web.mp4",
+      image: "/assets/custom/work-card-skill-lite.mp4",
       meta: "LEARN / SAVE",
     },
   ];

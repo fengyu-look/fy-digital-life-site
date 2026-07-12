@@ -54,6 +54,10 @@
     video.setAttribute("preload", "none");
 
     releaseSrc(video);
+    if (video.dataset.customVideoSrc?.includes("home-hero-user-video-lite.mp4")) {
+      restoreSrc(video);
+      play(video);
+    }
   };
 
   const observer = canObserve

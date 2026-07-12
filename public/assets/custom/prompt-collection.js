@@ -11,7 +11,7 @@
       title: "Prompt Name 02",
       description: "适合放镜头语言、主体、光线、质感和风格要求。",
       meta: "TEXT TO VIDEO",
-      image: "/assets/custom/work-card-prompt-web.mp4",
+      image: "/assets/custom/work-card-prompt-lite.mp4",
       prompt: "这里替换成你的完整文生视频提示词原文。"
     },
     {
@@ -39,7 +39,7 @@
       title: "Prompt Name 06",
       description: "后续复制这一张卡片，替换封面、标题和提示词。",
       meta: "TEMPLATE / SAVE",
-      image: "/assets/custom/work-card-skill-web.mp4",
+      image: "/assets/custom/work-card-skill-lite.mp4",
       prompt: "这里替换成你的完整提示词模板原文。"
     }
   ];

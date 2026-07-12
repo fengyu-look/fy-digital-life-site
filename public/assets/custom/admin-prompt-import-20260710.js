@@ -115,7 +115,7 @@ const staticContentSeeds = {
     {
       title: "Tool Name 04",
       summary: "后续复制这一张卡片，替换文字、图片和链接。",
-      cover_url: "/assets/custom/work-card-photo-web.mp4",
+      cover_url: "/assets/custom/work-card-photo-lite.mp4",
       link_url: "https://example.com",
       meta: "REFERENCE / DAILY",
     },
@@ -129,7 +129,7 @@ const staticContentSeeds = {
     {
       title: "Tool Name 06",
       summary: "如果没有图片，可以先换成统一风格的封面图。",
-      cover_url: "/assets/custom/work-card-skill-web.mp4",
+      cover_url: "/assets/custom/work-card-skill-lite.mp4",
       link_url: "https://example.com",
       meta: "LEARN / SAVE",
     },
@@ -146,7 +146,7 @@ const staticContentSeeds = {
     {
       title: "Prompt Name 02",
       summary: "适合放镜头语言、主体、光线、质感和风格要求。",
-      cover_url: "/assets/custom/work-card-prompt-web.mp4",
+      cover_url: "/assets/custom/work-card-prompt-lite.mp4",
       link_url: "",
       meta: "TEXT TO VIDEO",
       prompt: "这里替换成你的完整文生视频提示词原文。",
@@ -178,7 +178,7 @@ const staticContentSeeds = {
     {
       title: "Prompt Name 06",
       summary: "后续复制这一张卡片，替换封面、标题和提示词。",
-      cover_url: "/assets/custom/work-card-skill-web.mp4",
+      cover_url: "/assets/custom/work-card-skill-lite.mp4",
       link_url: "",
       meta: "TEMPLATE / SAVE",
       prompt: "这里替换成你的完整提示词模板原文。",

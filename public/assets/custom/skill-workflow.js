@@ -5,7 +5,7 @@
       title: "Skill Name 01",
       description: "这里写这个 Skill 解决什么问题、适合谁用、能提升哪一类工作效率。后续可以替换成真实 GitHub Skill 的介绍。",
       meta: "CONTENT / AUTOMATION",
-      image: "/assets/custom/work-card-skill-web.mp4",
+      image: "/assets/custom/work-card-skill-lite.mp4",
       includes: ["skill-name"],
       url: "https://github.com/your-name/your-skill"
     },
@@ -23,7 +23,7 @@
       title: "Workflow Name 01",
       description: "这里写这套工作流适合什么场景，以及多个 Skill 串起来后能完成什么结果。比如从选题、资料整理到成稿发布的一整套流程。",
       meta: "RESEARCH / WRITING",
-      image: "/assets/custom/work-card-prompt-web.mp4",
+      image: "/assets/custom/work-card-prompt-lite.mp4",
       includes: ["dbs-content", "content-research-writer", "stop-slop"],
       url: "https://github.com/your-name/workflow-readme"
     },
@@ -100,7 +100,7 @@
       title: item.title,
       description: textFrom(data.use_cases) || item.summary || "",
       meta: item.category || data.applicable_scene || "SKILL / WORKFLOW",
-      image: item.cover_url || "/assets/custom/work-card-skill-web.mp4",
+      image: item.cover_url || "/assets/custom/work-card-skill-lite.mp4",
       includes: listFrom(data.includes).length ? listFrom(data.includes) : listFrom(item.tags),
       url: item.link_url || "#",
       linkLabel: data.button_label || (String(type).toUpperCase() === "WORKFLOW" ? "VIEW WORKFLOW" : "VIEW ON GITHUB"),
